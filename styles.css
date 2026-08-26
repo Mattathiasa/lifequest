@@ -1,0 +1,455 @@
+/* ── Tokens (same as the Flutter app) ──────────────────────────────────── */
+:root {
+  --canvas: #05070A;
+  --canvas-top: #0B1018;
+  --canvas-mid: #070A0F;
+  --accent: #C7F022;
+  --accent-hover: #D9FF4F;
+  --text-primary: #ECF1F8;
+  --slate: #7789AB;
+  --muted: #4E5A70;
+  --faint: #2C3648;
+  --surface: rgba(119,137,171,.05);
+  --surface-raised: rgba(119,137,171,.07);
+  --border: rgba(119,137,171,.14);
+  --border-strong: rgba(119,137,171,.20);
+  --accent-surface: rgba(199,240,34,.08);
+  --accent-border: rgba(199,240,34,.30);
+  --track-inactive: rgba(119,137,171,.16);
+
+  --font-sora: 'Sora', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+/* ── Reset ────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  font-family: var(--font-sora);
+  font-weight: 300;
+  color: var(--text-primary);
+  background: linear-gradient(180deg, var(--canvas-top), var(--canvas-mid) 55%, var(--canvas));
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: var(--accent-hover); }
+
+.container {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ── Typography ───────────────────────────────────────────────────────── */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 16px;
+}
+
+h1 {
+  font-family: var(--font-sora);
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin-bottom: 16px;
+}
+
+h2 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  line-height: 1.3;
+  margin-bottom: 32px;
+}
+
+h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.sub {
+  font-size: 1rem;
+  color: var(--slate);
+  max-width: 440px;
+  margin-bottom: 40px;
+  line-height: 1.6;
+}
+
+.mono-sm {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--slate);
+}
+
+.mono-xs {
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.accent { color: var(--accent); }
+
+/* ── Hero ─────────────────────────────────────────────────────────────── */
+.hero {
+  padding: 80px 0 60px;
+  text-align: center;
+}
+
+/* ── Phone mockup ─────────────────────────────────────────────────────── */
+.phone-mockup {
+  margin: 40px auto;
+  max-width: 280px;
+}
+
+.phone-bezel {
+  background: linear-gradient(200deg, rgba(119,137,171,.35), rgba(119,137,171,.06) 45%, rgba(199,240,34,.18));
+  border-radius: 28px;
+  padding: 4px;
+}
+
+.phone-screen {
+  background: var(--canvas);
+  border-radius: 24px;
+  padding: 20px 16px;
+  text-align: left;
+}
+
+.mock-greeting { margin-bottom: 16px; }
+.mock-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 4px 0 2px;
+}
+.mock-sub {
+  font-size: 0.75rem;
+  color: var(--slate);
+  font-weight: 300;
+}
+
+.mock-card {
+  border-radius: 16px;
+  padding: 14px;
+  margin-bottom: 14px;
+}
+
+.mock-hero-card {
+  background: linear-gradient(160deg, rgba(199,240,34,.09), rgba(119,137,171,.05));
+  border: 1px solid var(--track-inactive);
+}
+
+.mock-level-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.mock-level-num {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.mock-xp-right {
+  margin-left: auto;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.mock-ticks {
+  display: flex;
+  gap: 3px;
+  margin-bottom: 12px;
+}
+
+.tick {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--track-inactive);
+}
+
+.tick.filled {
+  background: var(--accent);
+}
+
+.mock-stats {
+  display: flex;
+  justify-content: space-around;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.mock-stats div {
+  text-align: center;
+}
+
+.mock-section {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.mock-quest {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  margin-bottom: 6px;
+  font-size: 0.7rem;
+}
+
+.mock-quest.cleared {
+  opacity: 0.5;
+}
+
+.mock-check {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--canvas);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+.mock-node-live {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(199,240,34,.14);
+  border: 1.5px solid var(--accent);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  flex-shrink: 0;
+}
+
+.mock-quest.live {
+  background: linear-gradient(150deg, rgba(199,240,34,.08), rgba(119,137,171,.05));
+  border-color: var(--accent-border);
+}
+
+.mock-qname {
+  flex: 1;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mock-qname.struck {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+
+/* ── Waitlist form ────────────────────────────────────────────────────── */
+.waitlist-form {
+  display: flex;
+  gap: 8px;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.waitlist-form input {
+  flex: 1;
+  font-family: var(--font-sora);
+  font-size: 0.85rem;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface-raised);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.waitlist-form input::placeholder {
+  color: var(--muted);
+}
+
+.waitlist-form input:focus {
+  border-color: var(--accent);
+}
+
+.waitlist-form button {
+  font-family: var(--font-sora);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 14px 24px;
+  border-radius: 14px;
+  border: none;
+  background: var(--accent);
+  color: var(--canvas);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.waitlist-form button:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+}
+
+.waitlist-form button:active {
+  transform: translateY(0);
+}
+
+.form-note {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 12px;
+  text-align: center;
+}
+
+/* ── Features ─────────────────────────────────────────────────────────── */
+.features {
+  padding: 80px 0;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.feature-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 24px;
+}
+
+.feature-icon {
+  font-size: 1.2rem;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.feature-card p {
+  font-size: 0.8rem;
+  color: var(--slate);
+  line-height: 1.5;
+}
+
+/* ── How it works ─────────────────────────────────────────────────────── */
+.how-it-works {
+  padding: 60px 0 80px;
+}
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.step {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.step-num {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  flex-shrink: 0;
+  padding-top: 3px;
+}
+
+.step p {
+  font-size: 0.8rem;
+  color: var(--slate);
+}
+
+/* ── Footer ───────────────────────────────────────────────────────────── */
+footer {
+  padding: 40px 0;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+
+.footer-tag {
+  color: var(--faint);
+  letter-spacing: 0.16em;
+}
+
+/* ── Reveal on scroll ─────────────────────────────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .feature-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .waitlist-form {
+    flex-direction: column;
+  }
+
+  .waitlist-form button {
+    width: 100%;
+  }
+
+  .hero {
+    padding: 60px 0 40px;
+  }
+}
+
+@media (min-width: 768px) {
+  h1 {
+    font-size: 3rem;
+  }
+
+  .phone-mockup {
+    max-width: 320px;
+  }
+}
