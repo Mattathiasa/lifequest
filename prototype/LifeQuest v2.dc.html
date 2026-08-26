@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"><style>body{margin:0;background:#05070A;font-family:Sora,system-ui,sans-serif;-webkit-font-smoothing:antialiased}a{color:#C7F022}a:hover{color:#d9ff4f}::-webkit-scrollbar{width:0}@keyframes lqPop{0%{transform:scale(.9);opacity:0}100%{transform:scale(1);opacity:1}}@keyframes lqRise{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}@keyframes lqSheet{from{transform:translateY(101%)}to{transform:translateY(0)}}@keyframes lqFly{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(0,-110px) scale(.6);opacity:0}}@keyframes lqHalo{0%{box-shadow:0 0 0 0 rgba(199,240,34,.35)}70%{box-shadow:0 0 0 14px rgba(199,240,34,0)}100%{box-shadow:0 0 0 0 rgba(199,240,34,0)}}@keyframes lqDrift{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}</style></helmet>
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;gap:56px;padding:48px 32px;background:radial-gradient(700px 500px at 20% 0%,rgba(119,137,171,.10),transparent 70%),#05070A;box-sizing:border-box">
+
+<div style="width:390px;height:844px;flex:none;position:relative;border-radius:48px;padding:5px;background:linear-gradient(200deg,rgba(119,137,171,.35),rgba(119,137,171,.06) 45%,rgba(199,240,34,.18));box-shadow:0 50px 110px -40px rgba(0,0,0,.95)">
+<div style="width:100%;height:100%;border-radius:43px;overflow:hidden;position:relative;display:flex;flex-direction:column;background:linear-gradient(185deg,#0B1018 0%,#070A0F 55%,#05070A 100%)">
+
+<div style="flex:none;height:52px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 26px 6px;position:relative;z-index:5">
+<span style="font:500 13px/1 Sora;color:#ECF1F8">9:41</span>
+<div style="position:absolute;left:50%;transform:translateX(-50%);top:9px;width:102px;height:25px;border-radius:15px;background:#000"></div>
+<div style="display:flex;gap:7px;align-items:center;font:400 10px/1 'DM Mono',monospace;color:#7789AB"><span>5G</span><span style="color:#C7F022">86%</span></div>
+</div>
+
+<div style="flex:1;overflow-y:auto;position:relative;z-index:2">
+
+<sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+<div data-screen-label="Home" style="padding:14px 0 26px">
+
+  <div style="padding:0 24px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+      <div>
+        <div style="font:400 11px/1 'DM Mono',monospace;letter-spacing:.14em;color:#7789AB">TUE 26 AUG · DAY {{ streak }}</div>
+        <div style="font:600 24px/1.25 Sora;color:#ECF1F8;margin-top:11px">Good morning, Matt</div>
+        <div style="font:300 13.5px/1.45 Sora;color:#7789AB;margin-top:6px">{{ dayHint }}</div>
+      </div>
+      <div onClick="{{ goProfile }}" style="width:42px;height:42px;flex:none;border-radius:16px;background:#131A24;border:1px solid rgba(119,137,171,.22);display:flex;align-items:center;justify-content:center;font:600 13px/1 Sora;color:#C7F022;cursor:pointer">MK</div>
+    </div>
+
+    <div style="margin-top:22px;padding:18px;border-radius:26px;background:linear-gradient(160deg,rgba(199,240,34,.09),rgba(119,137,171,.05));border:1px solid rgba(119,137,171,.16)">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end">
+        <div style="display:flex;align-items:baseline;gap:9px">
+          <span style="font:700 34px/1 Sora;color:#ECF1F8;letter-spacing:-.02em">{{ level }}</span>
+          <span style="font:400 10px/1 'DM Mono',monospace;letter-spacing:.16em;color:#7789AB;padding-bottom:4px">LEVEL</span>
+        </div>
+        <div style="text-align:right">
+          <div style="font:600 13px/1 Sora;color:#C7F022">{{ xpLabel }} XP</div>
+          <div style="font:400 10px/1 'DM Mono',monospace;color:#7789AB;margin-top:7px">{{ xpLeft }} to next</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:3px;height:6px;margin-top:16px">
+        <sc-for list="{{ xpTicks }}" as="t" hint-placeholder-count="20">
+          <div style="flex:1;border-radius:99px;background:{{ t.bg }};transition:background .45s"></div>
+        </sc-for>
+      </div>
+      <div style="display:flex;gap:16px;margin-top:16px">
+        <sc-for list="{{ headStats }}" as="s" hint-placeholder-count="3">
+          <div>
+            <div style="font:400 9.5px/1 'DM Mono',monospace;letter-spacing:.14em;color:#7789AB">{{ s.label }}</div>
+            <div style="font:600 15px/1 Sora;color:{{ s.color }};margin-top:8px">{{ s.value }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:26px 24px 4px">
+    <span style="font:600 13px/1 Sora;color:#ECF1F8">Today's trail</span>
+    <span style="font:400 10px/1 'DM Mono',monospace;letter-spacing:.12em;color:#7789AB">{{ trailProgress }}</span>
+  </div>
+
+  <div style="position:relative;padding:14px 24px 0">
+    <div style="position:absolute;left:51px;top:34px;bottom:52px;width:2px;background:linear-gradient(180deg,#C7F022 0%,#C7F022 {{ trailPct }},rgba(119,137,171,.2) {{ trailPct }},rgba(119,137,171,.2) 100%)"></div>
+    <div style="display:flex;flex-direction:column;gap:6px;position:relative">
+      <sc-for list="{{ trail }}" as="t" hint-placeholder-count="6">
+        <div onClick="{{ t.onClick }}" style="display:flex;gap:16px;align-items:center;cursor:pointer;padding:7px 0">
+          <div style="width:32px;height:32px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;font:500 10px/1 'DM Mono',monospace;background:{{ t.nodeBg }};border:2px solid {{ t.nodeBorder }};color:{{ t.nodeColor }};animation:{{ t.anim }};transition:all .35s">{{ t.mark }}</div>
+          <div style="flex:1;min-width:0;padding:13px 15px;border-radius:20px;background:{{ t.cardBg }};border:1px solid {{ t.cardBorder }};transition:all .3s" style-hover="border-color:rgba(199,240,34,.4)">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+              <div style="min-width:0">
+                <div style="font:500 14px/1.25 Sora;color:{{ t.nameColor }};text-decoration:{{ t.strike }};overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ t.name }}</div>
+                <div style="font:400 10px/1 'DM Mono',monospace;letter-spacing:.1em;color:#7789AB;margin-top:8px">{{ t.meta }}</div>
+              </div>
+              <span style="flex:none;font:600 13px/1 Sora;color:{{ t.xpColor }}">{{ t.xpLabel }}</span>
+            </div>
+            <sc-if value="{{ t.isNow }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;gap:8px;margin-top:13px">
+                <span onClick="{{ t.onStart }}" style="flex:1;text-align:center;padding:11px;border-radius:13px;background:#C7F022;color:#05070A;font:600 11.5px/1 Sora;cursor:pointer" style-hover="background:#d9ff4f">Start focus</span>
+                <span onClick="{{ t.onDone }}" style="padding:11px 14px;border-radius:13px;border:1px solid rgba(119,137,171,.3);color:#7789AB;font:600 11.5px/1 Sora;cursor:pointer" style-hover="color:#ECF1F8;border-color:rgba(236,241,248,.4)">Done</span>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+      </sc-for>
+
+      <div style="display:flex;gap:16px;align-items:center;padding:7px 0">
+        <div style="width:32px;height:32px;flex:none;border-radius:50%;background:{{ chestBg }};border:2px dashed {{ chestBorder }};display:flex;align-items:center;justify-content:center;font:500 12px/1 Sora;color:{{ chestColor }}">✦</div>
+        <div style="flex:1;padding:14px 15px;border-radius:20px;border:1px dashed {{ chestBorder }};background:{{ chestCardBg }}">
+          <div style="font:500 13.5px/1.2 Sora;color:{{ chestColor }}">{{ chestTitle }}</div>
+          <div style="font:400 10px/1 'DM Mono',monospace;letter-spacing:.1em;color:#7789AB;margin-top:8px">{{ chestMeta }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <sc-if value="{{ showChallenge }}" hint-placeholder-val="{{ true }}">
+  <div style="margin:24px 24px 0;padding:20px;border-radius:26px;background:linear-gradient(150deg,#1A2210,#0A0D12 70%);border:1px solid rgba(199,240,34,.28);position:relative;overflow:hidden">
+    <div style="position:absolute;top:-40px;right:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(199,240,34,.18),transparent 70%);animation:lqDrift 6s ease-in-out infinite"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;position:relative">
+      <span style="font:400 10px/1 'DM Mono',monospace;letter-spacing:.18em;color:#C7F022">SIDE QUEST · RARE</span>
+      <span style="font:400 10px/1 'DM Mono',monospace;color:#7789AB">expires 23:59</span>
+    </div>
+    <div style="font:600 19px/1.35 Sora;color:#ECF1F8;margin-top:14px;position:relative">Do the one thing you've been avoiding.</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:18px;position:relative">
+      <span style="font:700 20px/1 Sora;color:#C7F022">+300 XP</span>
+      <span onClick="{{ acceptChallenge }}" style="padding:12px 18px;border-radius:14px;background:{{ challengeBg }};color:{{ challengeColor }};border:1px solid rgba(199,240,34,.45);font:600 12px/1 Sora;cursor:pointer">{{ challengeCta }}</span>
+    </div>
+  </div>
+  </sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ isQuests }}" hint-placeholder-val="{{ true }}">
+<div data-screen-label="Quests" style="padding:14px 0 26px">
+  <div style="padding:0 24px;display:flex;justify-content:space-between;align-items:flex-end">
+    <div>
+      <div style="font:600 24px/1.2 Sora;color:#ECF1F8">Quest board</div>
+      <div style="font:400 10px/1 'DM Mono',monospace;letter-spacing:.14em;color:#7789AB;margin-top:11px">{{ questCount }} ACTIVE · {{ cat }}</div>
+    </div>
+    <div onClick="{{ openSheet }}" style="padding:12px 16px;border-radius:14px;background:#C7F022;color:#05070A;font:600 12px/1 Sora;cursor:pointer" style-hover="background:#d9ff4f">New</div>
+  </div>
+
+  <div style="display:flex;gap:22px;padding:22px 24px 0;border-bottom:1px solid rgba(119,137,171,.14)">
+    <sc-for list="{{ qtabs }}" as="t" hint-placeholder-count="4">
+      <div onClick="{{ t.onClick }}" style="padding:0 0 13px;cursor:pointer;font:500 10px/1 'DM Mono',monospace;letter-spacing:.12em;color:{{ t.color }};border-bottom:2px solid {{ t.line }};margin-bottom:-1px;transition:color .2s">{{ t.label }}</div>
+    </sc-for>
+  </div>
+
+  <div style="display:flex;gap:7px;overflow-x:auto;padding:16px 24px">
+    <sc-for list="{{ cats }}" as="c" hint-placeholder-count="7">
+      <div onClick="{{ c.onClick }}" style="flex:none;padding:9px 12px;border-radius:11px;font:500 9.5px/1 'DM Mono',monospace;letter-spacing:.1em;cursor:pointer;white-space:nowrap;color:{{ c.color }};background:{{ c.bg }};border:1px solid {{ c.border }};transition:all .2s">{{ c.label }}</div>
+    </sc-for>
+  </div>
+
+  <div style="padding:0 24px;display:flex;flex-direction:column;gap:10px">
+    <sc-for list="{{ listQuests }}" as="q" hint-placeholder-count="4">
+      <div onClick="{{ q.onClick }}" style="padding:16px;border-radius:22px;background:rgba(119,137,171,.05);border:1px solid rgba(119,137,171,.14);opacity:{{ q.opacity }};cursor:pointer;transition:all .25s" style-hover="border-color:rgba(199,240,34,.35);background:rgba(199,240,34,.04)">
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="width:40px;height:40px;flex:none;border-radius:14px;background:rgba(119,137,171,.1);border:1px solid rgba(119,137,171,.2);display:flex;align-items:center;justify-content:center;font:500 10px/1 'DM Mono',monospace;color:{{ q.dColor }}">{{ q.code }}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font:500 15px/1.25 Sora;color:#ECF1F8;text-decoration:{{ q.strike }}">{{ q.name }}</div>
+            <div style="font:300 12.5px/1.5 Sora;color:#7789AB;margin-top:6px">{{ q.desc }}</div>
+          </div>
+          <span style="flex:none;font:600 14px/1 Sora;color:{{ q.xpColor }}">{{ q.xpLabel }}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:9px;margin-top:14px;padding-left:54px;font:400 9.5px/1 'DM Mono',monospace;letter-spacing:.1em;color:#7789AB">
+          <span style="color:{{ q.dColor }}">{{ q.stars }} {{ q.diffUpper }}</span><span style="color:#2C3648">/</span>
+          <span>{{ q.time }}</span><span style="color:#2C3648">/</span><span>{{ q.due }}</span>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+
+  <sc-if value="{{ listEmpty }}" hint-placeholder-val="{{ false }}">
+    <div style="margin:8px 24px;padding:52px 26px;text-align:center;border-radius:26px;border:1px dashed rgba(119,137,171,.28)">
+      <div style="width:44px;height:44px;margin:0 auto;border-radius:16px;border:1px solid rgba(199,240,34,.4);display:flex;align-items:center;justify-content:center;font:400 16px/1 Sora;color:#C7F022">✦</div>
+      <div style="font:600 18px/1.35 Sora;color:#ECF1F8;margin-top:20px">Your adventure is waiting</div>
+      <div style="font:300 12.5px/1.55 Sora;color:#7789AB;margin-top:9px">Nothing queued here yet. Add a quest and it lands on today's trail.</div>
+      <div onClick="{{ openSheet }}" style="display:inline-block;margin-top:22px;padding:13px 18px;border-radius:14px;background:#C7F022;color:#05070A;font:600 12px/1 Sora;cursor:pointer">Create quest</div>
+    </div>
+  </sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ isChar }}" hint-placeholder-val="{{ true }}">
+<div data-screen-label="Character" style="padding:14px 0 26px">
+  <div style="padding:0 24px;display:flex;gap:16px;align-items:center">
+    <div style="width:76px;height:76px;flex:none;border-radius:26px;background:linear-gradient(160deg,rgba(199,240,34,.18),rgba(119,137,171,.08));border:1px solid rgba(199,240,34,.3);display:flex;align-items:center;justify-content:center;font:600 22px/1 Sora;color:#C7F022">MK</div>
+    <div>
+      <div style="font:400 10px/1 'DM Mono',monospace;letter-spacing:.16em;color:#7789AB">CLASS · SCHOLAR</div>
+      <div style="font:600 21px/1.25 Sora;color:#ECF1F8;margin-top:10px">Disciplined Adventurer</div>
+      <div style="font:400 10px/1 'DM Mono',monospace;letter-spacing:.1em;color:#C7F022;margin-top:9px">LVL {{ level }} · {{ lifetimeXp }} LIFETIME XP</div>
+    </div>
+  </div>
+
+  <div style="padding:26px 24px 0">
+    <div style="font:600 13px/1 Sora;color:#ECF1F8">Attributes</div>
+    <div style="display:flex;flex-direction:column;gap:13px;margin-top:16px">
+      <sc-for list="{{ attrs }}" as="a" hint-placeholder-count="7">
+        <div style="display:flex;align-items:center;gap:12px">
+          <span style="width:74px;flex:none;font:400 9.5px/1 'DM Mono',monospace;letter-spacing:.08em;color:#7789AB">{{ a.name }}</span>
+          <div style="flex:1;display:flex;gap:2px;height:8px">
+            <sc-for list="{{ a.ticks }}" as="t" hint-placeholder-count="20">
+              <div style="flex:1;border-radius:1px;background:{{ t.bg }}"></div>
+            </sc-for>
+          </div>
+          <span style="width:22px;text-align:right;font:600 13px/1 Sora;color:#ECF1F8">{{ a.val }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="padding:28px 24px 0">
+    <div style="display:flex;justify-content:space-between;align-items:baseline">
+      <span style="font:600 13px/1 Sora;color:#ECF1F8">Skill branches</span>
+      <span style="font:400 10px/1 'DM Mono',monospace;letter-spacing:.12em;color:#7789AB">{{ skillCatUpper }}</span>
+    </div>
+    <div style="display:flex;gap:7px;overflow-x:auto;padding:16px 0">
+      <sc-for list="{{ skillCats }}" as="s" hint-placeholder-count="7">
+        <div onClick="{{ s.onClick }}" style="flex:none;padding:9px 12px;border-radius:11px;font:500 9.5px/1 'DM Mono',monospace;letter-spacing:.1em;cursor:pointer;white-space:nowrap;color:{{ s.color }};background:{{ s.bg }};border:1px solid {{ s.border }};transition:all .2s">{{ s.label }}</div>
+      </sc-for>
+    </div>
+    <div style="display:flex;gap:8px">
+      <sc-for list="{{ nodes }}" as="n" hint-placeholder-count="4">
+        <div onClick="{{ n.onClick }}" style="flex:1;padding:14px 10px;border-radius:20px;text-align:center;background:rgba(119,137,171,.05);border:1px solid {{ n.selBorder }};cursor:pointer;transition:all .25s" style-hover="background:rgba(199,240,34,.05)">
+          <div style="width:30px;height:30px;margin:0 auto;border-radius:50%;background:{{ n.bg }};border:2px solid {{ n.border }};color:{{ n.color }};display:flex;align-items:center;justify-content:center;font:500 11px/1 Sora">{{ n.mark }}</div>
+          <div style="font:500 11px/1.25 Sora;color:{{ n.text }};margin-top:11px">{{ n.name }}</div>
+          <div style="font:400 8.5px/1 'DM Mono',monospace;letter-spacing:.08em;color:#4E5A70;margin-top:7px">{{ n.state }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <sc-if value="{{ hasNode }}" hint-placeholder-val="{{ true }}">
+      <div style="margin-top:12px;padding:18px;border-radius:22px;background:linear-gradient(150deg,rgba(199,240,34,.07),rgba(119,137,171,.04));border:1px solid rgba(199,240,34,.22);animation:lqRise .28s ease both">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font:600 15px/1 Sora;color:#ECF1F8">{{ nodeName }}</span>
+          <span style="font:400 9.5px/1 'DM Mono',monospace;letter-spacing:.14em;color:#C7F022">{{ nodeState }}</span>
+        </div>
+        <div style="font:300 12.5px/1.6 Sora;color:#7789AB;margin-top:10px">{{ nodeDesc }}</div>
+        <div style="display:flex;gap:8px;margin-top:15px;flex-wrap:wrap">
+          <span style="padding:7px 10px;border-radius:9px;background:rgba(199,240,34,.12);color:#C7F022;font:500 9.5px/1 'DM Mono',monospace;letter-spacing:.08em">{{ nodeBenefit }}</span>
+          <span style="padding:7px 10px;border-radius:9px;background:rgba(119,137,171,.1);color:#7789AB;font:500 9.5px/1 'DM Mono',monospace;letter-spacing:.08em">{{ nodeReq }}</span>
+        </div>
+      </div>
+    </sc-if>
+  </div>
+
+  <div style="padding:28px 24px 0">
+    <div style="font:600 13px/1 Sora;color:#ECF1F8">Achievements</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:16px">
+      <sc-for list="{{ badges }}" as="b" hint-placeholder-count="6">
+        <div style="padding:15px;border-radius:20px;background:{{ b.bg }};border:1px solid {{ b.border }}">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font:400 13px/1 Sora;color:{{ b.markColor }}">{{ b.mark }}</span>
+            <span style="font:400 8.5px/1 'DM Mono',monospace;letter-spacing:.08em;color:#4E5A70">{{ b.hint }}</span>
+          </div>
+          <div style="font:500 12px/1.3 Sora;color:{{ b.color }};margin-top:14px">{{ b.name }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isProg }}" hint-placeholder-val="{{ true }}">
+<div data-screen-label="Progress" style="padding:14px 24px 26px">
+  <div style="font:600 24px/1.2 Sora;color:#ECF1F8">Progress</div>
+
+  <div style="display:flex;gap:9px;margin-top:20px">
+    <sc-for list="{{ progStats }}" as="s" hint-placeholder-count="3">
+      <div style="flex:1;padding:16px 14px;border-radius:20px;background:rgba(119,137,171,.05);border:1px solid rgba(119,137,171,.14)">
+        <div style="font:600 22px/1 Sora;color:{{ s.color }}">{{ s.value }}</div>
+        <div style="font:400 8.5px/1 'DM Mono',monospace;letter-spacing:.12em;color:#7789AB;margin-top:10px">{{ s.label }}</div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="margin-top:12px;padding:20px;border-radius:24px;background:rgba(119,137,171,.05);border:1px solid rgba(119,137,171,.14)">
+    <div style="display:flex;justify-content:space-between;align-items:baseline">
+      <span style="font:600 13px/1 Sora;color:#ECF1F8">Weekly XP</span>
+      <span style="font:400 10px/1 'DM Mono',monospace;color:#C7F022">4,180 TOTAL</span>
+    </div>
+    <div style="display:flex;align-items:flex-end;gap:8px;height:112px;margin-top:20px">
+      <sc-for list="{{ weekBars }}" as="b" hint-placeholder-count="7">
+        <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:9px;height:100%">
+          <div style="width:100%;border-radius:8px;background:{{ b.bg }};height:{{ b.h }};transition:height .5s"></div>
+          <span style="font:400 9px/1 'DM Mono',monospace;color:{{ b.labelColor }}">{{ b.day }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="margin-top:12px;padding:20px;border-radius:24px;background:rgba(119,137,171,.05);border:1px solid rgba(119,137,171,.14)">
+    <div style="display:flex;justify-content:space-between;align-items:baseline">
+      <span style="font:600 13px/1 Sora;color:#ECF1F8">Consistency</span>
+      <span style="font:400 10px/1 'DM Mono',monospace;color:#C7F022">{{ streak }} DAY STREAK</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(14,1fr);gap:5px;margin-top:18px">
+      <sc-for list="{{ heat }}" as="h" hint-placeholder-count="42">
+        <div style="aspect-ratio:1;border-radius:3px;background:{{ h.bg }}"></div>
+      </sc-for>
+    </div>
+    <div style="font:400 9px/1 'DM Mono',monospace;letter-spacing:.1em;color:#4E5A70;margin-top:14px">LAST 6 WEEKS · LIME = QUESTS CLEARED</div>
+  </div>
+
+  <div style="margin-top:12px;padding:20px;border-radius:24px;background:rgba(119,137,171,.05);border:1px solid rgba(119,137,171,.14)">
+    <span style="font:600 13px/1 Sora;color:#ECF1F8">Where your XP goes</span>
+    <div style="display:flex;flex-direction:column;gap:13px;margin-top:18px">
+      <sc-for list="{{ dist }}" as="d" hint-placeholder-count="5">
+        <div>
+          <div style="display:flex;justify-content:space-between;font:400 11px/1 Sora;color:#7789AB"><span>{{ d.name }}</span><span style="color:#ECF1F8">{{ d.pct }}</span></div>
+          <div style="height:5px;border-radius:99px;background:rgba(119,137,171,.14);margin-top:8px;overflow:hidden"><div style="height:100%;border-radius:99px;background:{{ d.color }};width:{{ d.pct }}"></div></div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="margin-top:12px;padding:20px;border-radius:24px;background:linear-gradient(150deg,rgba(199,240,34,.09),rgba(119,137,171,.04));border:1px solid rgba(199,240,34,.24)">
+    <div style="font:400 9.5px/1 'DM Mono',monospace;letter-spacing:.18em;color:#C7F022">COACH</div>
+    <div style="font:300 13.5px/1.6 Sora;color:#ECF1F8;margin-top:12px">Twelve Health quests this month, three Learning. Your Knowledge branch stalls at <em style="font-style:normal;color:#C7F022">Practitioner</em> — one 30-minute learning quest today gets it moving.</div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isProf }}" hint-placeholder-val="{{ true }}">
+<div data-screen-label="Profile" style="padding:14px 24px 26px">
+  <div style="display:flex;gap:16px;align-items:center">
+    <div style="width:64px;height:64px;flex:none;border-radius:22px;background:linear-gradient(160deg,rgba(199,240,34,.18),rgba(119,137,171,.08));border:1px solid rgba(199,240,34,.3);display:flex;align-items:center;justify-content:center;font:600 19px/1 Sora;color:#C7F022">MK</div>
+    <div>
+      <div style="font:600 19px/1.25 Sora;color:#ECF1F8">Matt Kowalski</div>
+      <div style="font:400 10px/1 'DM Mono',monospace;letter-spacing:.1em;color:#C7F022;margin-top:9px">LVL {{ level }} · DISCIPLINED ADVENTURER</div>
+      <div style="font:400 10px/1 'DM Mono',monospace;letter-spacing:.08em;color:#4E5A70;margin-top:8px">ADVENTURING SINCE MAR 2026</div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:9px;margin-top:22px">
+    <sc-for list="{{ profStats }}" as="s" hint-placeholder-count="3">
+      <div style="flex:1;padding:16px 13px;border-radius:20px;background:rgba(119,137,171,.05);border:1px solid rgba(119,137,171,.14)">
+        <div style="font:600 18px/1 Sora;color:{{ s.color }}">{{ s.value }}</div>
+        <div style="font:400 8.5px/1 'DM Mono',monospace;letter-spacing:.1em;color:#7789AB;margin-top:10px">{{ s.label }}</div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="margin-top:12px;border-radius:24px;background:rgba(119,137,171,.05);border:1px solid rgba(119,137,171,.14);overflow:hidden">
+    <sc-for list="{{ settings }}" as="s" hint-placeholder-count="5">
+      <div style="display:flex;align-items:center;gap:12px;padding:17px 18px;border-bottom:1px solid rgba(119,137,171,.1);cursor:pointer;transition:background .2s" style-hover="background:rgba(199,240,34,.04)">
+        <div style="flex:1">
+          <div style="font:500 13px/1 Sora;color:#ECF1F8">{{ s.name }}</div>
+          <div style="font:300 11px/1 Sora;color:#7789AB;margin-top:7px">{{ s.hint }}</div>
+        </div>
+        <span style="font:400 12px/1 Sora;color:#4E5A70">›</span>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="text-align:center;font:400 9.5px/1 'DM Mono',monospace;letter-spacing:.14em;color:#2C3648;margin-top:22px">LIFEQUEST 1.0 · LEVEL UP YOUR REAL LIFE</div>
+</div>
+</sc-if>
+
+</div>
+
+<div style="flex:none;position:relative;z-index:6;padding:10px 18px 24px;background:linear-gradient(180deg,rgba(5,7,10,0),rgba(5,7,10,.94) 40%,#05070A);border-top:1px solid rgba(119,137,171,.12)">
+  <div style="display:flex;justify-content:space-between;align-items:center">
+    <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="5">
+      <div onClick="{{ n.onClick }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:9px;padding:8px 0;cursor:pointer">
+        <div style="width:5px;height:5px;border-radius:50%;background:{{ n.dot }};transition:background .25s"></div>
+        <span style="font:{{ n.weight }} 10.5px/1 Sora;color:{{ n.color }};transition:color .25s">{{ n.label }}</span>
+      </div>
+    </sc-for>
+  </div>
+</div>
+
+<sc-if value="{{ sheetOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;z-index:28;background:rgba(5,7,10,.86);backdrop-filter:blur(8px);display:flex;flex-direction:column">
+  <div onClick="{{ closeSheet }}" style="flex:1"></div>
+  <div style="border-radius:34px 34px 0 0;background:linear-gradient(180deg,#111823,#080B11);border-top:1px solid rgba(119,137,171,.22);padding:20px 24px 28px;max-height:88%;overflow-y:auto;animation:lqSheet .34s cubic-bezier(.22,1,.36,1) both">
+    <div style="width:38px;height:4px;border-radius:99px;background:rgba(119,137,171,.3);margin:0 auto 20px"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <span style="font:600 19px/1 Sora;color:#ECF1F8">New quest</span>
+      <span onClick="{{ closeSheet }}" style="font:400 16px/1 Sora;color:#7789AB;cursor:pointer">✕</span>
+    </div>
+
+    <div onClick="{{ runAi }}" style="margin-top:18px;display:flex;align-items:center;gap:13px;padding:16px;border-radius:20px;background:linear-gradient(140deg,rgba(199,240,34,.12),rgba(119,137,171,.05));border:1px solid rgba(199,240,34,.3);cursor:pointer" style-hover="border-color:rgba(199,240,34,.55)">
+      <div style="width:34px;height:34px;flex:none;border-radius:12px;border:1px solid rgba(199,240,34,.4);display:flex;align-items:center;justify-content:center;font:400 14px/1 Sora;color:#C7F022">✦</div>
+      <div style="flex:1">
+        <div style="font:500 13px/1.3 Sora;color:#ECF1F8">{{ aiTitle }}</div>
+        <div style="font:300 11.5px/1.4 Sora;color:#7789AB;margin-top:5px">{{ aiSub }}</div>
+      </div>
+      <span style="font:500 11px/1 Sora;color:#C7F022">{{ aiCta }}</span>
+    </div>
+
+    <sc-if value="{{ hasAi }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:11px;display:flex;flex-direction:column;gap:8px;animation:lqRise .3s ease both">
+        <sc-for list="{{ aiQuests }}" as="a" hint-placeholder-count="4">
+          <div style="display:flex;align-items:center;gap:12px;padding:13px 15px;border-radius:16px;background:rgba(119,137,171,.06);border:1px solid rgba(119,137,171,.16)">
+            <span style="font:500 9.5px/1 'DM Mono',monospace;color:#7789AB">{{ a.code }}</span>
+            <span style="flex:1;font:500 12.5px/1 Sora;color:#ECF1F8">{{ a.name }}</span>
+            <span style="font:600 12px/1 Sora;color:#C7F022">+{{ a.xp }}</span>
+          </div>
+        </sc-for>
+        <div onClick="{{ acceptAi }}" style="margin-top:3px;text-align:center;padding:15px;border-radius:17px;background:#C7F022;color:#05070A;font:600 12.5px/1 Sora;cursor:pointer">Add all four</div>
+      </div>
+    </sc-if>
+
+    <div style="height:1px;background:rgba(119,137,171,.14);margin:22px 0"></div>
+
+    <div style="display:flex;flex-direction:column;gap:18px">
+      <div>
+        <div style="font:400 9.5px/1 'DM Mono',monospace;letter-spacing:.16em;color:#7789AB;margin-bottom:10px">QUEST NAME</div>
+        <input type="text" value="{{ formName }}" onChange="{{ setName }}" placeholder="Run 5 KM" style="width:100%;box-sizing:border-box;padding:15px 16px;border-radius:16px;background:rgba(119,137,171,.07);border:1px solid rgba(119,137,171,.2);color:#ECF1F8;font:400 14px/1 Sora;outline:none"></input>
+      </div>
+      <div>
+        <div style="font:400 9.5px/1 'DM Mono',monospace;letter-spacing:.16em;color:#7789AB;margin-bottom:10px">CATEGORY</div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap">
+          <sc-for list="{{ formCats }}" as="c" hint-placeholder-count="6">
+            <div onClick="{{ c.onClick }}" style="padding:9px 12px;border-radius:11px;font:500 9.5px/1 'DM Mono',monospace;letter-spacing:.1em;cursor:pointer;color:{{ c.color }};background:{{ c.bg }};border:1px solid {{ c.border }}">{{ c.label }}</div>
+          </sc-for>
+        </div>
+      </div>
+      <div>
+        <div style="font:400 9.5px/1 'DM Mono',monospace;letter-spacing:.16em;color:#7789AB;margin-bottom:10px">DIFFICULTY SETS THE REWARD</div>
+        <div style="display:flex;gap:8px">
+          <sc-for list="{{ formDiffs }}" as="d" hint-placeholder-count="4">
+            <div onClick="{{ d.onClick }}" style="flex:1;text-align:center;padding:14px 0;border-radius:16px;cursor:pointer;background:{{ d.bg }};border:1px solid {{ d.border }};transition:all .2s">
+              <div style="font:500 11.5px/1 Sora;color:{{ d.color }}">{{ d.label }}</div>
+              <div style="font:400 9px/1 'DM Mono',monospace;color:{{ d.color }};opacity:.7;margin-top:7px">+{{ d.xp }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <div style="flex:1">
+          <div style="font:400 9.5px/1 'DM Mono',monospace;letter-spacing:.16em;color:#7789AB;margin-bottom:10px">DUE</div>
+          <div style="padding:14px 15px;border-radius:16px;background:rgba(119,137,171,.07);border:1px solid rgba(119,137,171,.2);font:400 12.5px/1 Sora;color:#ECF1F8">Today · 8:00 PM</div>
+        </div>
+        <div style="flex:1">
+          <div style="font:400 9.5px/1 'DM Mono',monospace;letter-spacing:.16em;color:#7789AB;margin-bottom:10px">REPEAT</div>
+          <div style="padding:14px 15px;border-radius:16px;background:rgba(119,137,171,.07);border:1px solid rgba(119,137,171,.2);font:400 12.5px/1 Sora;color:#ECF1F8">Daily</div>
+        </div>
+      </div>
+    </div>
+
+    <div onClick="{{ saveQuest }}" style="margin-top:24px;text-align:center;padding:17px;border-radius:19px;background:#C7F022;color:#05070A;font:600 13.5px/1 Sora;cursor:pointer" style-hover="background:#d9ff4f">Add to trail</div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ runOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;z-index:30;background:rgba(5,7,10,.86);backdrop-filter:blur(8px);display:flex;flex-direction:column">
+  <div onClick="{{ closeRun }}" style="flex:1"></div>
+  <div style="border-radius:34px 34px 0 0;background:linear-gradient(180deg,#111823,#080B11);border-top:1px solid rgba(119,137,171,.22);padding:20px 24px 30px;animation:lqSheet .34s cubic-bezier(.22,1,.36,1) both">
+    <div style="width:38px;height:4px;border-radius:99px;background:rgba(119,137,171,.3);margin:0 auto 22px"></div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+      <div>
+        <div style="font:400 10px/1 'DM Mono',monospace;letter-spacing:.16em;color:#7789AB">{{ runMeta }}</div>
+        <div style="font:600 21px/1.3 Sora;color:#ECF1F8;margin-top:11px">{{ runName }}</div>
+      </div>
+      <span onClick="{{ closeRun }}" style="font:400 16px/1 Sora;color:#7789AB;cursor:pointer">✕</span>
+    </div>
+    <div style="font:300 13px/1.55 Sora;color:#7789AB;margin-top:12px">{{ runDesc }}</div>
+    <div style="margin:24px 0 4px;text-align:center">
+      <div style="font:600 66px/1 Sora;color:#ECF1F8;letter-spacing:-.03em;font-variant-numeric:tabular-nums">{{ runClock }}</div>
+      <div style="font:400 10px/1 'DM Mono',monospace;letter-spacing:.18em;color:#7789AB;margin-top:12px">{{ runStatus }}</div>
+    </div>
+    <div style="display:flex;gap:3px;height:5px;margin:20px 0 24px">
+      <sc-for list="{{ runTicks }}" as="t" hint-placeholder-count="24">
+        <div style="flex:1;border-radius:99px;background:{{ t.bg }}"></div>
+      </sc-for>
+    </div>
+    <div style="display:flex;gap:10px">
+      <span onClick="{{ toggleRun }}" style="flex:1;text-align:center;padding:16px;border-radius:18px;border:1px solid rgba(119,137,171,.3);color:#ECF1F8;font:600 13px/1 Sora;cursor:pointer" style-hover="border-color:rgba(236,241,248,.5)">{{ runToggleLabel }}</span>
+      <span onClick="{{ finishRun }}" style="flex:1.4;text-align:center;padding:16px;border-radius:18px;background:#C7F022;color:#05070A;font:600 13px/1 Sora;cursor:pointer" style-hover="background:#d9ff4f">Complete · {{ runXp }} XP</span>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ hasFlash }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 45%,rgba(199,240,34,.18),rgba(5,7,10,.9) 60%);pointer-events:none">
+  <div style="text-align:center;animation:lqPop .4s cubic-bezier(.22,1,.36,1) both">
+    <div style="width:82px;height:82px;margin:0 auto;border-radius:28px;background:#C7F022;display:flex;align-items:center;justify-content:center;font:600 34px/1 Sora;color:#05070A">✓</div>
+    <div style="font:400 10px/1 'DM Mono',monospace;letter-spacing:.24em;color:#7789AB;margin-top:22px">QUEST COMPLETE</div>
+    <div style="font:700 42px/1 Sora;color:#C7F022;margin-top:14px;animation:lqFly 1.3s .3s cubic-bezier(.4,0,.6,1) both">+{{ flashXp }}</div>
+    <div style="font:400 13px/1 Sora;color:#ECF1F8;margin-top:4px">{{ flashName }}</div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ hasLevelUp }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(5,7,10,.96),rgba(26,34,16,.96));pointer-events:none">
+  <div style="text-align:center;animation:lqPop .45s cubic-bezier(.22,1,.36,1) both;padding:0 40px">
+    <div style="font:400 10px/1 'DM Mono',monospace;letter-spacing:.3em;color:#C7F022">LEVEL UP</div>
+    <div style="display:flex;align-items:baseline;justify-content:center;gap:14px;margin-top:22px">
+      <span style="font:300 38px/1 Sora;color:#7789AB">{{ prevLevel }}</span>
+      <span style="font:300 18px/1 Sora;color:#7789AB">→</span>
+      <span style="font:700 76px/1 Sora;color:#ECF1F8;letter-spacing:-.03em">{{ level }}</span>
+    </div>
+    <div style="font:300 14px/1.55 Sora;color:#7789AB;margin-top:20px">Your character has grown stronger.</div>
+    <div style="display:inline-block;margin-top:20px;padding:11px 16px;border-radius:99px;border:1px solid rgba(199,240,34,.4);font:500 11.5px/1 Sora;color:#C7F022">New branch unlocked · Focus</div>
+  </div>
+</div>
+</sc-if>
+
+</div>
+</div>
+
+<div style="width:290px;flex:none;color:#7789AB;font:300 13px/1.7 Sora">
+  <div style="font:400 10px/1 'DM Mono',monospace;letter-spacing:.22em;color:#C7F022">LIFEQUEST — DIRECTION 2</div>
+  <div style="font:600 22px/1.3 Sora;color:#ECF1F8;margin-top:14px">The day as a trail, not a list.</div>
+  <p style="margin:16px 0 0">Quests sit on one continuous path — done behind you, the live one open with actions inline, the rest ahead. Tapping <em style="color:#ECF1F8;font-style:normal">Start focus</em> opens a run sheet with a live timer instead of a checkbox.</p>
+  <p style="margin:14px 0 0;color:#4E5A70">Lime #C7F022 · black #000 · slate #7789AB · Sora + DM Mono.</p>
+</div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;100%&quot;,&quot;height&quot;:940},&quot;difficultyMode&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Casual&quot;,&quot;Balanced&quot;,&quot;Hardcore&quot;],&quot;default&quot;:&quot;Balanced&quot;,&quot;tsType&quot;:&quot;'Casual'|'Balanced'|'Hardcore'&quot;,&quot;section&quot;:&quot;Gameplay&quot;},&quot;showDailyChallenge&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Gameplay&quot;}}">
+const D = {Easy:{c:'#7789AB',s:'I',xp:50},Medium:{c:'#C7F022',s:'II',xp:150},Hard:{c:'#E8B923',s:'III',xp:280},Epic:{c:'#FF7A6B',s:'IV',xp:500}};
+const CATS = ['All','Health','Learning','Productivity','Social','Finance','Mindfulness'];
+const TREE = {
+  Health:[{n:'Beginner',s:'Mastered',r:'5 quests',d:'You showed up. The first week is the hard one.',b:'+1 HEALTH per quest',x:'0 XP'},
+    {n:'Consistent',s:'Unlocked',r:'25 quests',d:'Health quests four days a week, for a month.',b:'+2 HEALTH per quest',x:'1,200 XP'},
+    {n:'Athlete',s:'Available',r:'60 quests',d:'Sustain hard training quests for eight weeks.',b:'Unlocks epic training chains',x:'3,400 XP'},
+    {n:'Elite',s:'Locked',r:'150 quests',d:'Needs Athlete plus a 100-day streak.',b:'+5 HEALTH · Elite title',x:'9,000 XP'}],
+  Knowledge:[{n:'Curious',s:'Mastered',r:'5 quests',d:'First study sessions logged.',b:'+1 INTELLECT',x:'0 XP'},
+    {n:'Student',s:'Unlocked',r:'30 quests',d:'A month of daily learning.',b:'+2 INTELLECT',x:'1,500 XP'},
+    {n:'Practitioner',s:'Available',r:'80 quests',d:'Ship something you learned — projects count double.',b:'Unlocks project chains',x:'4,000 XP'},
+    {n:'Expert',s:'Locked',r:'200 quests',d:'Teach the thing you learned.',b:'+5 INTELLECT · Scholar',x:'12,000 XP'}],
+  Career:[{n:'Focused',s:'Unlocked',r:'10 quests',d:'Deep-work blocks five days running.',b:'+1 FOCUS',x:'600 XP'},
+    {n:'Operator',s:'Available',r:'40 quests',d:'Plan the week before it starts, four weeks straight.',b:'Weekly planning slot',x:'2,600 XP'},
+    {n:'Lead',s:'Locked',r:'100 quests',d:'Mentoring and delegation quests unlock here.',b:'+3 SOCIAL · +3 FOCUS',x:'7,500 XP'},
+    {n:'Founder',s:'Locked',r:'250 quests',d:'The long game.',b:'Legendary title',x:'18,000 XP'}],
+  Finance:[{n:'Tracker',s:'Unlocked',r:'8 quests',d:'Log spending for two weeks.',b:'+1 DISCIPLINE',x:'400 XP'},
+    {n:'Saver',s:'Available',r:'30 quests',d:'Hit a monthly savings target three times.',b:'Unlocks goal vault',x:'2,000 XP'},
+    {n:'Investor',s:'Locked',r:'75 quests',d:'Automate, then review quarterly.',b:'+3 DISCIPLINE',x:'6,000 XP'},
+    {n:'Free',s:'Locked',r:'200 quests',d:'Runway measured in years.',b:'Legendary title',x:'20,000 XP'}],
+  Bonds:[{n:'Present',s:'Unlocked',r:'6 quests',d:'Phone away, people first.',b:'+1 SOCIAL',x:'300 XP'},
+    {n:'Connector',s:'Available',r:'25 quests',d:'Reach out weekly for two months.',b:'Unlocks shared quests',x:'1,800 XP'},
+    {n:'Anchor',s:'Locked',r:'70 quests',d:'Be the person others rely on.',b:'+3 SOCIAL',x:'5,500 XP'},
+    {n:'Community',s:'Locked',r:'160 quests',d:'Build something with other people.',b:'Legendary title',x:'14,000 XP'}],
+  Craft:[{n:'Maker',s:'Unlocked',r:'6 quests',d:'Finish small things, often.',b:'+1 CREATIVITY',x:'350 XP'},
+    {n:'Craftsman',s:'Available',r:'28 quests',d:'A daily practice, thirty days.',b:'Unlocks portfolio quests',x:'1,900 XP'},
+    {n:'Author',s:'Locked',r:'80 quests',d:'Publish the work.',b:'+3 CREATIVITY',x:'6,200 XP'},
+    {n:'Visionary',s:'Locked',r:'180 quests',d:'A body of work.',b:'Legendary title',x:'16,000 XP'}],
+  Mind:[{n:'Still',s:'Mastered',r:'7 quests',d:'A week of sitting with your own head.',b:'+1 DISCIPLINE',x:'0 XP'},
+    {n:'Grounded',s:'Unlocked',r:'30 quests',d:'Daily meditation for a month.',b:'+2 DISCIPLINE',x:'1,400 XP'},
+    {n:'Centered',s:'Available',r:'75 quests',d:'Longer sits plus one full detox day.',b:'Unlocks retreat adventure',x:'3,800 XP'},
+    {n:'Serene',s:'Locked',r:'180 quests',d:'Equanimity under real pressure.',b:'+5 DISCIPLINE',x:'13,000 XP'}]
+};
+const NST = {
+  Mastered:{bg:'#C7F022',border:'#C7F022',color:'#05070A',mark:'✦',text:'#ECF1F8'},
+  Unlocked:{bg:'rgba(199,240,34,.16)',border:'#C7F022',color:'#C7F022',mark:'●',text:'#ECF1F8'},
+  Available:{bg:'transparent',border:'#7789AB',color:'#7789AB',mark:'○',text:'#ECF1F8'},
+  Locked:{bg:'transparent',border:'rgba(119,137,171,.28)',color:'rgba(119,137,171,.5)',mark:'—',text:'#4E5A70'}
+};
+const chip = (on) => on
+  ? {color:'#05070A',bg:'#C7F022',border:'#C7F022'}
+  : {color:'#7789AB',bg:'rgba(119,137,171,.08)',border:'rgba(119,137,171,.2)'};
+
+class Component extends DCLogic {
+  state = {
+    tab:'home', level:12, xp:2450, lifetime:34120, streak:14,
+    qtab:'Today', cat:'All', skillCat:'Health', node:1,
+    sheet:false, formName:'', formCat:'Health', formDiff:'Medium', ai:false,
+    run:null, runSec:0, running:false,
+    flash:null, levelUp:null, challenge:false,
+    quests:[
+      {id:1,code:'MOV',name:'Morning Workout',desc:'30 minutes, anything that raises your heart rate.',cat:'Health',diff:'Medium',time:'30 min',due:'8:00 AM',when:'today',done:true},
+      {id:2,code:'HYD',name:'Drink 2L Water',desc:'Spread across the day, not all at once.',cat:'Health',diff:'Easy',time:'all day',due:'Today',when:'today',done:true},
+      {id:3,code:'FOC',name:'Deep Work Block',desc:'One task, no tabs, no phone. Sixty minutes.',cat:'Productivity',diff:'Hard',time:'60 min',due:'11:00 AM',when:'today',done:false},
+      {id:4,code:'STU',name:'Study Session',desc:'Flutter architecture — repository pattern chapter.',cat:'Learning',diff:'Medium',time:'60 min',due:'7:00 PM',when:'today',done:false},
+      {id:5,code:'MED',name:'Meditation',desc:'Ten minutes, eyes closed, breath only.',cat:'Mindfulness',diff:'Easy',time:'10 min',due:'9:30 PM',when:'today',done:false},
+      {id:6,code:'RST',name:'Sleep before 11 PM',desc:'Protect tomorrow morning.',cat:'Health',diff:'Easy',time:'—',due:'11:00 PM',when:'today',done:false},
+      {id:7,code:'RUN',name:'Run 5 KM',desc:'Long run, easy pace, no watch anxiety.',cat:'Health',diff:'Medium',time:'30–45 min',due:'Tomorrow',when:'upcoming',done:false},
+      {id:8,code:'FIN',name:'Review Budget',desc:'Categorise last month and set one limit.',cat:'Finance',diff:'Medium',time:'25 min',due:'Fri',when:'upcoming',done:false},
+      {id:9,code:'SHP',name:'Ship Side Project',desc:'Deploy the first public version.',cat:'Productivity',diff:'Epic',time:'3 h',due:'Sun',when:'upcoming',done:false},
+      {id:10,code:'CAL',name:'Call a Friend',desc:'Someone you have not spoken to in a while.',cat:'Social',diff:'Easy',time:'20 min',due:'Daily',when:'recurring',done:false},
+      {id:11,code:'RED',name:'Read 20 Pages',desc:'Every night, before the screen wins.',cat:'Learning',diff:'Easy',time:'20 min',due:'Daily',when:'recurring',done:false}
+    ]
+  };
+  need(l){ return 250 * l; }
+  mult(){ const m = this.props.difficultyMode; return m === 'Casual' ? 1.5 : m === 'Hardcore' ? 0.7 : 1; }
+  reward(diff){ return Math.round(D[diff].xp * this.mult() / 10) * 10; }
+  addXp(amount){
+    let xp = this.state.xp + amount, level = this.state.level, prev = level;
+    while (xp >= this.need(level)) { xp -= this.need(level); level++; }
+    this.setState({xp, level, lifetime: this.state.lifetime + amount});
+    if (level > prev) {
+      clearTimeout(this._lu);
+      this._lu = setTimeout(() => {
+        this.setState({levelUp: prev});
+        this._lu2 = setTimeout(() => this.setState({levelUp:null}), 2600);
+      }, 1400);
+    }
+  }
+  complete(q){
+    if (q.done) return;
+    const xp = this.reward(q.diff);
+    this.setState({quests: this.state.quests.map(x => x.id === q.id ? {...x, done:true} : x), flash:{xp, name:q.name}, run:null, running:false, runSec:0});
+    clearInterval(this._t);
+    clearTimeout(this._f);
+    this._f = setTimeout(() => this.setState({flash:null}), 1700);
+    this.addXp(xp);
+  }
+  startRun(q, autoplay){
+    this.setState({run:q.id, runSec:0, running:!!autoplay});
+    clearInterval(this._t);
+    if (autoplay) this._t = setInterval(() => this.setState(s => ({runSec: s.runSec + 1})), 1000);
+  }
+  toggle(){
+    const on = !this.state.running;
+    this.setState({running:on});
+    clearInterval(this._t);
+    if (on) this._t = setInterval(() => this.setState(s => ({runSec: s.runSec + 1})), 1000);
+  }
+  componentWillUnmount(){ clearInterval(this._t); [this._f,this._lu,this._lu2].forEach(clearTimeout); }
+  ticks(n, filled, onColor, offColor){
+    return Array.from({length:n}, (_,i) => ({bg: i < filled ? onColor : offColor}));
+  }
+  renderVals(){
+    const s = this.state, need = this.need(s.level);
+    const today = s.quests.filter(q => q.when === 'today');
+    const doneCount = today.filter(q => q.done).length;
+    const pct = Math.round(doneCount / today.length * 100);
+    const firstOpen = today.find(q => !q.done);
+    const runQ = s.quests.find(q => q.id === s.run) || null;
+    const mm = String(Math.floor(s.runSec / 60)).padStart(2,'0'), ss = String(s.runSec % 60).padStart(2,'0');
+    const catOk = q => s.cat === 'All' || q.cat === s.cat;
+    let list = s.qtab === 'Completed' ? s.quests.filter(q => q.done)
+      : s.qtab === 'Today' ? s.quests.filter(q => q.when === 'today' && !q.done)
+      : s.quests.filter(q => q.when === s.qtab.toLowerCase() && !q.done);
+    list = list.filter(catOk);
+    const node = TREE[s.skillCat][s.node] || null;
+    const attrs = [
+      {name:'STRENGTH',val:64},{name:'INTELLECT',val:81},{name:'DISCIPLINE',val:88},
+      {name:'HEALTH',val:72},{name:'CREATIVITY',val:57},{name:'SOCIAL',val:43},{name:'FOCUS',val:76}
+    ].map(a => ({...a, ticks: this.ticks(20, Math.round(a.val/5), '#C7F022', 'rgba(119,137,171,.16)')}));
+    const week = [420,610,380,720,540,910,600], maxW = Math.max(...week);
+    const card = (q, i) => {
+      const d = D[q.diff];
+      return {...q, idx: String(i+1).padStart(2,'0'), xp: this.reward(q.diff), xpLabel: '+' + this.reward(q.diff),
+        dColor: d.c, stars: d.s, diffUpper: q.diff.toUpperCase(),
+        meta: q.cat.toUpperCase() + ' · ' + q.time, metaLine: q.cat.toUpperCase() + ' · ' + q.due,
+        opacity: q.done ? '.5' : '1', strike: q.done ? 'line-through' : 'none',
+        check: q.done ? '✓' : '', checkBg: q.done ? '#C7F022' : 'transparent',
+        checkBorder: q.done ? '#C7F022' : 'rgba(119,137,171,.35)',
+        xpColor: q.done ? '#4E5A70' : '#C7F022',
+        onClick: () => this.startRun(q, false)};
+    };
+    return {
+      isHome: s.tab==='home', isQuests: s.tab==='quests', isChar: s.tab==='character',
+      isProg: s.tab==='progress', isProf: s.tab==='profile',
+      level: s.level, nextLevel: s.level+1, streak: s.streak,
+      titleLabel: 'DISCIPLINED ADVENTURER',
+      xpLabel: s.xp.toLocaleString() + ' / ' + need.toLocaleString(),
+      xpLeft: (need - s.xp).toLocaleString() + ' XP',
+      lifetimeXp: s.lifetime.toLocaleString(),
+      xpTicks: this.ticks(20, Math.round(s.xp/need*20), '#C7F022', 'rgba(119,137,171,.18)'),
+      dayHint: pct === 100 ? 'Trail cleared. Rest is part of it.' : firstOpen ? 'Next up: ' + firstOpen.name.toLowerCase() + '.' : 'Ready when you are.',
+      headStats: [
+        {label:'STREAK', value: s.streak + ' days', color:'#ECF1F8'},
+        {label:'TODAY', value: pct + '%', color:'#C7F022'},
+        {label:'THIS WEEK', value:'86%', color:'#ECF1F8'}
+      ],
+      trailProgress: doneCount + ' of ' + today.length + ' cleared',
+      trailPct: Math.round(doneCount / today.length * 100) + '%',
+      trail: today.map((q,i) => {
+        const isNow = firstOpen && q.id === firstOpen.id;
+        return {...card(q,i), isNow,
+          mark: q.done ? '✓' : String(i+1).padStart(2,'0'),
+          nodeBg: q.done ? '#C7F022' : isNow ? 'rgba(199,240,34,.14)' : 'transparent',
+          nodeBorder: q.done ? '#C7F022' : isNow ? '#C7F022' : 'rgba(119,137,171,.3)',
+          nodeColor: q.done ? '#05070A' : isNow ? '#C7F022' : '#4E5A70',
+          anim: isNow ? 'lqHalo 2.4s ease-out infinite' : 'none',
+          cardBg: isNow ? 'linear-gradient(150deg,rgba(199,240,34,.08),rgba(119,137,171,.05))' : 'rgba(119,137,171,.05)',
+          cardBorder: isNow ? 'rgba(199,240,34,.35)' : 'rgba(119,137,171,.14)',
+          nameColor: q.done ? '#4E5A70' : '#ECF1F8',
+          onStart: () => this.startRun(q, true),
+          onDone: () => this.complete(q)};
+      }),
+      chestTitle: pct === 100 ? 'Day cleared · +250 bonus XP' : 'Clear the trail for +250 XP',
+      chestMeta: pct === 100 ? 'CLAIMED · STREAK EXTENDED TO ' + (s.streak + 1) : (today.length - doneCount) + ' QUESTS REMAINING',
+      chestBg: pct === 100 ? '#C7F022' : 'transparent',
+      chestBorder: pct === 100 ? '#C7F022' : 'rgba(119,137,171,.3)',
+      chestColor: pct === 100 ? '#C7F022' : '#7789AB',
+      chestCardBg: pct === 100 ? 'rgba(199,240,34,.07)' : 'transparent',
+      showChallenge: this.props.showDailyChallenge !== false,
+      challengeCta: s.challenge ? 'Accepted' : 'Accept',
+      challengeBg: s.challenge ? 'transparent' : '#C7F022',
+      challengeColor: s.challenge ? '#C7F022' : '#05070A',
+      acceptChallenge: () => { if (!s.challenge) { this.setState({challenge:true, flash:{xp:300, name:'Side quest'}}); clearTimeout(this._f); this._f = setTimeout(()=>this.setState({flash:null}),1700); this.addXp(300); } },
+      goQuests: () => this.setState({tab:'quests'}),
+      goProfile: () => this.setState({tab:'profile'}),
+      screenCode: s.tab.toUpperCase(),
+      navItems: [['home','Trail'],['quests','Quests'],['character','Character'],['progress','Progress'],['profile','You']].map(([k,label]) => ({
+        label, dot: s.tab===k ? '#C7F022' : 'transparent',
+        color: s.tab===k ? '#ECF1F8' : '#4E5A70',
+        weight: s.tab===k ? 600 : 400,
+        onClick: () => this.setState({tab:k})
+      })),
+      questCount: s.quests.filter(q => !q.done).length,
+      cat: s.cat.toUpperCase(),
+      qtabs: ['Today','Upcoming','Recurring','Completed'].map(t => ({
+        label:t.toUpperCase(), onClick: () => this.setState({qtab:t}),
+        color: s.qtab===t ? '#ECF1F8' : '#4E5A70',
+        line: s.qtab===t ? '#C7F022' : 'transparent'
+      })),
+      cats: CATS.map(c => ({label:c.toUpperCase(), onClick: () => this.setState({cat:c}), ...chip(s.cat===c)})),
+      listQuests: list.map((q,i) => card(q,i)),
+      listEmpty: list.length === 0,
+      skillCat: s.skillCat, skillCatUpper: s.skillCat.toUpperCase(),
+      skillCats: Object.keys(TREE).map(c => ({label:c.toUpperCase(), onClick: () => this.setState({skillCat:c, node:0}), ...chip(s.skillCat===c)})),
+      nodes: TREE[s.skillCat].map((n,i) => ({
+        name:n.n, state:n.s.toUpperCase(), req:n.r, xpLabel:n.x, ...NST[n.s],
+        selBorder: s.node===i ? '#C7F022' : 'transparent',
+        onClick: () => this.setState({node:i})
+      })),
+      hasNode: !!node,
+      nodeName: node ? node.n : '', nodeDesc: node ? node.d : '',
+      nodeBenefit: node ? node.b : '', nodeReq: node ? node.r + ' · ' + node.x : '',
+      nodeState: node ? node.s.toUpperCase() : '',
+      attrs,
+      badges: [
+        {name:'7 Day Streak',hint:'Earned Apr 2',on:true},{name:'First Level Up',hint:'Earned Mar 8',on:true},
+        {name:'Quest Hunter',hint:'68 / 100',on:false},{name:'Night Owl',hint:'Earned Jun 19',on:true},
+        {name:'Perfect Week',hint:'5 / 7 days',on:false},{name:'Level 25',hint:'Locked',on:false}
+      ].map(b => ({...b,
+        bg: b.on ? 'rgba(199,240,34,.07)' : 'transparent',
+        border: b.on ? 'rgba(199,240,34,.3)' : 'rgba(119,137,171,.16)',
+        color: b.on ? '#ECF1F8' : '#4E5A70',
+        mark: b.on ? '✦' : '—',
+        markColor: b.on ? '#C7F022' : '#4E5A70'})),
+      progStats: [
+        {value:'86%',label:'COMPLETION',color:'#C7F022'},
+        {value:'14',label:'STREAK',color:'#ECF1F8'},
+        {value:'31',label:'RECORD',color:'#ECF1F8'}
+      ],
+      weekBars: ['M','T','W','T','F','S','S'].map((day,i) => ({
+        day, val: week[i], h: Math.round(week[i]/maxW*100) + '%',
+        bg: i===5 ? '#C7F022' : 'rgba(119,137,171,.28)',
+        labelColor: i===5 ? '#C7F022' : '#4E5A70'
+      })),
+      heat: Array.from({length:42}, (_,i) => {
+        const v = [0,.35,.7,1][(i*7+3) % 4];
+        return {bg: v === 0 ? 'rgba(119,137,171,.12)' : 'rgba(199,240,34,' + (v*.85+.15) + ')'};
+      }),
+      dist: [
+        {name:'Health',pct:'38%',color:'#C7F022'},{name:'Learning',pct:'22%',color:'rgba(199,240,34,.6)'},
+        {name:'Productivity',pct:'19%',color:'#7789AB'},{name:'Mindfulness',pct:'13%',color:'rgba(119,137,171,.6)'},
+        {name:'Social',pct:'8%',color:'rgba(119,137,171,.35)'}
+      ],
+      profStats: [
+        {value: s.lifetime.toLocaleString(), label:'LIFETIME XP', color:'#C7F022'},
+        {value:'68', label:'QUESTS DONE', color:'#ECF1F8'},
+        {value:'12', label:'BADGES', color:'#ECF1F8'}
+      ],
+      settings: [
+        {name:'Appearance',hint:'Dark · lime accent'},
+        {name:'Notifications',hint:'Trail reminders, streak alerts'},
+        {name:'Difficulty',hint: (this.props.difficultyMode || 'Balanced')},
+        {name:'Privacy',hint:'Data stays on device'},
+        {name:'Account',hint:'matt@lifequest.app'}
+      ],
+      sheetOpen: s.sheet,
+      openSheet: () => this.setState({sheet:true}),
+      closeSheet: () => this.setState({sheet:false, ai:false, formName:''}),
+      formName: s.formName,
+      setName: (e) => this.setState({formName: e.target.value}),
+      formCats: CATS.slice(1).map(c => ({label:c.toUpperCase(), onClick: () => this.setState({formCat:c}), ...chip(s.formCat===c)})),
+      formDiffs: Object.keys(D).map(k => ({
+        label:k, xp:this.reward(k), onClick: () => this.setState({formDiff:k}),
+        color: s.formDiff===k ? '#05070A' : '#7789AB',
+        bg: s.formDiff===k ? '#C7F022' : 'transparent',
+        border: s.formDiff===k ? '#C7F022' : 'rgba(119,137,171,.22)'
+      })),
+      aiTitle: s.ai ? 'From “I want to become healthier”' : 'Generate with AI',
+      aiSub: s.ai ? 'Edit anything before it joins your trail.' : 'Describe a goal, get a quest chain back.',
+      aiCta: s.ai ? 'Redo' : 'Try it',
+      hasAi: s.ai,
+      runAi: () => this.setState({ai: !s.ai}),
+      aiQuests: [
+        {code:'HYD',name:'Drink 2L water',xp:40},{code:'WLK',name:'Walk 8,000 steps',xp:90},
+        {code:'MOV',name:'Exercise 30 minutes',xp:150},{code:'RST',name:'Sleep before 11 PM',xp:80}
+      ],
+      acceptAi: () => {
+        const base = Math.max(...s.quests.map(q => q.id)) + 1;
+        const add = [
+          {code:'HYD',name:'Drink 2L water',desc:'Spread across the day.',cat:'Health',diff:'Easy',time:'all day',due:'Daily'},
+          {code:'WLK',name:'Walk 8,000 steps',desc:'Move between the desk hours.',cat:'Health',diff:'Easy',time:'60 min',due:'Daily'},
+          {code:'MOV',name:'Exercise 30 minutes',desc:'Any training counts.',cat:'Health',diff:'Medium',time:'30 min',due:'Daily'},
+          {code:'RST',name:'Sleep before 11 PM',desc:'Protect tomorrow morning.',cat:'Health',diff:'Easy',time:'—',due:'Daily'}
+        ].map((q,i) => ({...q, id: base+i, when:'recurring', done:false}));
+        this.setState({quests: s.quests.concat(add), sheet:false, ai:false, tab:'quests', qtab:'Recurring'});
+      },
+      saveQuest: () => {
+        const name = s.formName.trim() || 'Run 5 KM';
+        const id = Math.max(...s.quests.map(q => q.id)) + 1;
+        this.setState({
+          quests: [{id, code: name.slice(0,3).toUpperCase(), name, desc:'Added just now.', cat:s.formCat, diff:s.formDiff, time:'30 min', due:'Today, 8:00 PM', when:'today', done:false}].concat(s.quests),
+          sheet:false, ai:false, formName:'', tab:'quests', qtab:'Today'
+        });
+      },
+      runOpen: !!runQ,
+      runName: runQ ? runQ.name : '', runDesc: runQ ? runQ.desc : '',
+      runMeta: runQ ? runQ.cat.toUpperCase() + ' · ' + runQ.diff.toUpperCase() + ' · ' + runQ.time : '',
+      runXp: runQ ? '+' + this.reward(runQ.diff) : '',
+      runClock: mm + ':' + ss,
+      runStatus: s.running ? 'FOCUS RUNNING' : s.runSec ? 'PAUSED' : 'READY WHEN YOU ARE',
+      runToggleLabel: s.running ? 'Pause' : s.runSec ? 'Resume' : 'Start',
+      runTicks: this.ticks(24, Math.min(24, Math.round(s.runSec/2.5)), '#C7F022', 'rgba(119,137,171,.16)'),
+      toggleRun: () => this.toggle(),
+      finishRun: () => { if (runQ) this.complete(runQ); },
+      closeRun: () => { clearInterval(this._t); this.setState({run:null, running:false, runSec:0}); },
+      hasFlash: !!s.flash,
+      flashXp: s.flash ? s.flash.xp : '', flashName: s.flash ? s.flash.name : '',
+      hasLevelUp: s.levelUp !== null,
+      prevLevel: s.levelUp === null ? '' : s.levelUp
+    };
+  }
+}
+</script>
+</body>
+</html>
