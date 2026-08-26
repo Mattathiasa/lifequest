@@ -26,6 +26,12 @@ class QuestListNotifier extends Notifier<List<Quest>> {
       for (final q in state) q.id == questId ? q.copyWith(done: true) : q,
     ];
   }
+
+  Future<void> add(Quest quest) async {
+    final repo = ref.read(questRepositoryProvider);
+    await repo.add(quest);
+    state = [quest, ...state];
+  }
 }
 
 final questListProvider = NotifierProvider<QuestListNotifier, List<Quest>>(
