@@ -1,12 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../data/in_memory_quest_repository.dart';
+import '../data/prefs_quest_repository.dart';
 import '../domain/quest.dart';
 import '../domain/quest_repository.dart';
 
-/// The quest repository — in-memory for now, Firebase later.
+/// The quest repository — locally persisted; Firebase later behind the same
+/// interface.
 final questRepositoryProvider = Provider<QuestRepository>(
-  (_) => InMemoryQuestRepository(),
+  (_) => PrefsQuestRepository(),
 );
 
 /// State holder for the list of quests.

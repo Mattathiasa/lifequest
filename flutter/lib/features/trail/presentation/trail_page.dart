@@ -89,6 +89,12 @@ class _TrailPageState extends ConsumerState<TrailPage> {
 
     // Trail gradient progress
     final trailPct = totalCount > 0 ? clearedCount / totalCount : 0.0;
+    final lastCleared = prog.lastClearedDay;
+    final claimedToday =
+        lastCleared != null &&
+        lastCleared.year == now.year &&
+        lastCleared.month == now.month &&
+        lastCleared.day == now.day;
 
     return Container(
       decoration: const BoxDecoration(gradient: AppColors.screen),
@@ -212,10 +218,15 @@ class _TrailPageState extends ConsumerState<TrailPage> {
 
                   // ── Reward node ──
                   _RewardNode(
-                    allCleared: clearedCount == totalCount,
+                    allCleared: totalCount > 0 && clearedCount == totalCount,
+                    claimed: claimedToday,
+                    streak: prog.streak,
                     remaining: totalCount - clearedCount,
-                    onClaim: clearedCount == totalCount
-                        ? () => _claimDayBonus()
+                    onClaim:
+                        totalCount > 0 &&
+                            clearedCount == totalCount &&
+                            !claimedToday
+                        ? _claimDayBonus
                         : null,
                   ),
 
@@ -249,64 +260,17 @@ class _TrailPageState extends ConsumerState<TrailPage> {
     showFocusSheet(context, quest: quest, autoStart: false);
   }
 
-  void _completeQuest(Quest quest) async {
-    final notifier = ref.read(progressionProvider.notifier);
-    final questNotifier = ref.read(questListProvider.notifier);
-
-    // Compute XP reward using the chosen difficulty mode
-    final xp = XpRules.reward(
-      quest.difficulty,
-      ref.read(difficultyModeProvider),
-    );
-
-    // Complete the quest
-    await questNotifier.complete(quest.id);
-
-    // Show flash overlay
-    notifier.showFlash(xp: xp, name: quest.name);
-
-    // Award XP after a delay (so flash shows first)
-    Future.delayed(const Duration(milliseconds: 300), () {
-      if (!mounted) return;
-      final result = notifier.award(xp);
-      if (result.leveledUp) {
-        Future.delayed(Motion.levelUpDelay, () {
-          if (!mounted) return;
-          notifier.showLevelUp(result.previousLevel);
-        });
-      }
-    });
+  void _completeQuest(Quest quest) {
+    ref.read(progressionProvider.notifier).completeQuest(quest);
   }
 
-  void _claimDayBonus() async {
-    final notifier = ref.read(progressionProvider.notifier);
-    notifier.showFlash(xp: XpRules.dayClearBonus, name: 'Day cleared');
-    Future.delayed(const Duration(milliseconds: 300), () {
-      if (!mounted) return;
-      final result = notifier.award(XpRules.dayClearBonus);
-      if (result.leveledUp) {
-        Future.delayed(Motion.levelUpDelay, () {
-          if (!mounted) return;
-          notifier.showLevelUp(result.previousLevel);
-        });
-      }
-    });
+  void _claimDayBonus() {
+    ref.read(progressionProvider.notifier).claimDayBonus();
   }
 
-  void _acceptSideQuest() async {
+  void _acceptSideQuest() {
     setState(() => _sideQuestAccepted = true);
-    final notifier = ref.read(progressionProvider.notifier);
-    notifier.showFlash(xp: 300, name: 'Side quest');
-    Future.delayed(const Duration(milliseconds: 300), () {
-      if (!mounted) return;
-      final result = notifier.award(300);
-      if (result.leveledUp) {
-        Future.delayed(Motion.levelUpDelay, () {
-          if (!mounted) return;
-          notifier.showLevelUp(result.previousLevel);
-        });
-      }
-    });
+    ref.read(progressionProvider.notifier).acceptSideQuest();
   }
 }
 
@@ -514,11 +478,15 @@ class _TrailRow extends StatelessWidget {
 class _RewardNode extends StatelessWidget {
   const _RewardNode({
     required this.allCleared,
+    required this.claimed,
+    required this.streak,
     required this.remaining,
     this.onClaim,
   });
 
   final bool allCleared;
+  final bool claimed;
+  final int streak;
   final int remaining;
   final VoidCallback? onClaim;
 
@@ -586,14 +554,18 @@ class _RewardNode extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Day cleared · +250 bonus XP',
+                            claimed
+                                ? 'Day cleared · +250 bonus XP'
+                                : 'Claim +250 bonus XP',
                             style: AppType.trailTitle.copyWith(
                               color: AppColors.accent,
                             ),
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'CLAIMED · STREAK EXTENDED TO 15',
+                            claimed
+                                ? 'CLAIMED · STREAK EXTENDED TO $streak'
+                                : 'TAP TO CLAIM',
                             style: AppType.metaLabel.copyWith(
                               color: AppColors.accent,
                             ),

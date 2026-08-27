@@ -43,6 +43,41 @@ class Quest {
       done: done ?? this.done,
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'code': code,
+    'name': name,
+    'desc': desc,
+    'category': category.name,
+    'difficulty': difficulty.name,
+    'time': time,
+    'due': due,
+    'schedule': schedule.name,
+    'done': done,
+  };
+
+  factory Quest.fromJson(Map<String, dynamic> json) => Quest(
+    id: (json['id'] as num).toInt(),
+    code: json['code'] as String,
+    name: json['name'] as String,
+    desc: json['desc'] as String,
+    category: QuestCategory.values.firstWhere(
+      (c) => c.name == json['category'],
+      orElse: () => QuestCategory.productivity,
+    ),
+    difficulty: QuestDifficulty.values.firstWhere(
+      (d) => d.name == json['difficulty'],
+      orElse: () => QuestDifficulty.medium,
+    ),
+    time: json['time'] as String,
+    due: json['due'] as String,
+    schedule: QuestSchedule.values.firstWhere(
+      (s) => s.name == json['schedule'],
+      orElse: () => QuestSchedule.today,
+    ),
+    done: json['done'] as bool? ?? false,
+  );
 }
 
 enum QuestCategory {

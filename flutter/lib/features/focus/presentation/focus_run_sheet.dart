@@ -9,7 +9,6 @@ import '../../../core/widgets/glass_sheet.dart';
 import '../../../core/widgets/xp_tick_bar.dart';
 import '../../progression/application/progression_controller.dart';
 import '../../progression/domain/xp_rules.dart';
-import '../../quests/application/quest_providers.dart';
 import '../../quests/domain/quest.dart';
 import '../../settings/application/settings_controller.dart';
 import '../application/focus_timer_controller.dart';
@@ -152,33 +151,13 @@ class _FocusRunSheetContentState extends ConsumerState<_FocusRunSheetContent> {
     );
   }
 
-  void _complete(Quest quest) async {
-    final focusCtrl = ref.read(focusTimerProvider.notifier);
-    final progCtrl = ref.read(progressionProvider.notifier);
-
-    final completedQuest = focusCtrl.complete();
+  void _complete(Quest quest) {
+    final completedQuest = ref.read(focusTimerProvider.notifier).complete();
     if (completedQuest == null) return;
-
-    if (mounted) Navigator.of(context).pop();
-
-    final xp = XpRules.reward(
-      completedQuest.difficulty,
-      ref.read(difficultyModeProvider),
-    );
-    await ref.read(questListProvider.notifier).complete(completedQuest.id);
-
-    progCtrl.showFlash(xp: xp, name: completedQuest.name);
-
-    Future.delayed(const Duration(milliseconds: 300), () {
-      if (!mounted) return;
-      final result = progCtrl.award(xp);
-      if (result.leveledUp) {
-        Future.delayed(Motion.levelUpDelay, () {
-          if (!mounted) return;
-          progCtrl.showLevelUp(result.previousLevel);
-        });
-      }
-    });
+    Navigator.of(context).pop();
+    // The controller owns the flash → XP → level-up sequence; it keeps running
+    // after this sheet closes.
+    ref.read(progressionProvider.notifier).completeQuest(completedQuest);
   }
 
   int _parseTimeToSeconds(String time) {
