@@ -8,6 +8,7 @@ import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/xp_tick_bar.dart';
 import '../../../core/widgets/category_chip.dart';
 import '../../progression/application/progression_controller.dart';
+import '../../settings/application/settings_controller.dart';
 
 /// Skill tree node data from the prototype.
 class SkillNode {
@@ -313,6 +314,7 @@ class _CharacterPageState extends ConsumerState<CharacterPage> {
   @override
   Widget build(BuildContext context) {
     final prog = ref.watch(progressionStateProvider);
+    final initials = ref.watch(initialsProvider);
     final nodes = _skillTree[_skillBranch] ?? [];
     final selectedNode = _selectedNode < nodes.length
         ? nodes[_selectedNode]
@@ -343,7 +345,7 @@ class _CharacterPageState extends ConsumerState<CharacterPage> {
                           border: Border.all(color: AppColors.accentBorder),
                         ),
                         child: Text(
-                          'MA',
+                          initials,
                           style: AppType.heroLevel.copyWith(
                             color: AppColors.accent,
                             fontSize: 22,

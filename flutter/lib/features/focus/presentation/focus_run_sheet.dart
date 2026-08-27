@@ -11,6 +11,7 @@ import '../../progression/application/progression_controller.dart';
 import '../../progression/domain/xp_rules.dart';
 import '../../quests/application/quest_providers.dart';
 import '../../quests/domain/quest.dart';
+import '../../settings/application/settings_controller.dart';
 import '../application/focus_timer_controller.dart';
 
 /// Opens the focus run sheet as a modal bottom sheet.
@@ -49,9 +50,19 @@ class _FocusRunSheetContentState extends ConsumerState<_FocusRunSheetContent> {
   }
 
   @override
+  void dispose() {
+    // Dismissing the sheet (scrim tap, back, or complete) resets the timer so
+    // it never keeps ticking in the background. Safe to call twice.
+    ref.read(focusTimerProvider.notifier).close();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final timerState = ref.watch(focusTimerProvider);
+    final mode = ref.watch(difficultyModeProvider);
     final quest = widget.quest;
+    final reward = XpRules.reward(quest.difficulty, mode);
     final category = quest.category.uppercase;
     final diffLabel = quest.difficulty.numeral;
     final meta =
@@ -128,7 +139,7 @@ class _FocusRunSheetContentState extends ConsumerState<_FocusRunSheetContent> {
                       borderRadius: BorderRadius.circular(Radii.button),
                     ),
                     child: Text(
-                      'Complete · +${quest.xp}',
+                      'Complete · +$reward',
                       style: AppType.buttonPrimary,
                     ),
                   ),
@@ -152,7 +163,7 @@ class _FocusRunSheetContentState extends ConsumerState<_FocusRunSheetContent> {
 
     final xp = XpRules.reward(
       completedQuest.difficulty,
-      DifficultyMode.balanced,
+      ref.read(difficultyModeProvider),
     );
     await ref.read(questListProvider.notifier).complete(completedQuest.id);
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/navigation/nav_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
@@ -10,6 +11,17 @@ import '../../../core/widgets/glass_sheet.dart';
 import '../../progression/domain/xp_rules.dart';
 import '../../quests/application/quest_providers.dart';
 import '../../quests/domain/quest.dart';
+import '../../settings/application/settings_controller.dart';
+
+/// The (stubbed) AI prompt and the quest chain it "returns". No backend yet —
+/// deterministic sample so the generated-list UI is real and reviewable.
+const _aiPrompt = 'I want to become healthier';
+const _generated = <({String code, String name, QuestDifficulty diff})>[
+  (code: 'HYD', name: 'Drink 2L water', diff: QuestDifficulty.easy),
+  (code: 'MOV', name: '20-minute walk', diff: QuestDifficulty.easy),
+  (code: 'SLP', name: 'Lights out by 11', diff: QuestDifficulty.medium),
+  (code: 'VEG', name: 'One green meal', diff: QuestDifficulty.easy),
+];
 
 /// Opens the create quest sheet.
 void showCreateQuestSheet(BuildContext context) {
@@ -32,13 +44,24 @@ class _CreateQuestSheetContentState
   bool _aiGenerated = false;
 
   @override
+  void initState() {
+    super.initState();
+    // Rebuild as the user types so the "Add to trail" button enables/disables.
+    _nameController.addListener(_onNameChanged);
+  }
+
+  void _onNameChanged() => setState(() {});
+
+  @override
   void dispose() {
+    _nameController.removeListener(_onNameChanged);
     _nameController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final mode = ref.watch(difficultyModeProvider);
     return GlassSheet(
       child: SingleChildScrollView(
         child: Column(
@@ -51,6 +74,10 @@ class _CreateQuestSheetContentState
               onTryIt: () => setState(() => _aiGenerated = true),
               onRedo: () => setState(() => _aiGenerated = false),
             ),
+
+            // Generated quest chain
+            if (_aiGenerated)
+              _GeneratedList(mode: mode, onAddAll: _addAllGenerated),
 
             const SizedBox(height: Gap.lg),
             Divider(color: AppColors.borderHairline),
@@ -90,7 +117,7 @@ class _CreateQuestSheetContentState
             Row(
               children: QuestDifficulty.values.map((diff) {
                 final isSelected = _difficulty == diff;
-                final reward = XpRules.reward(diff, DifficultyMode.balanced);
+                final reward = XpRules.reward(diff, mode);
                 return Expanded(
                   child: GestureDetector(
                     onTap: () {
@@ -204,7 +231,7 @@ class _CreateQuestSheetContentState
 
     final quest = Quest(
       id: DateTime.now().millisecondsSinceEpoch,
-      code: name.substring(0, name.length.clamp(0, 3)).toUpperCase(),
+      code: _codeFor(name),
       name: name,
       desc: 'Created by you.',
       category: _category,
@@ -216,6 +243,39 @@ class _CreateQuestSheetContentState
 
     ref.read(questListProvider.notifier).add(quest);
     Navigator.of(context).pop();
+  }
+
+  /// Adds the generated chain as recurring quests and lands on Quests →
+  /// Recurring, per the spec.
+  void _addAllGenerated() {
+    final notifier = ref.read(questListProvider.notifier);
+    final base = DateTime.now().millisecondsSinceEpoch;
+    for (var i = 0; i < _generated.length; i++) {
+      final g = _generated[i];
+      notifier.add(
+        Quest(
+          id: base + i,
+          code: g.code,
+          name: g.name,
+          desc: 'From your AI goal · $_aiPrompt.',
+          category: QuestCategory.health,
+          difficulty: g.diff,
+          time: '15 min',
+          due: 'Daily',
+          schedule: QuestSchedule.recurring,
+        ),
+      );
+    }
+    ref.read(boardTabProvider.notifier).state = 2; // Recurring
+    ref.read(navIndexProvider.notifier).state = 1; // Quests tab
+    Navigator.of(context).pop();
+  }
+
+  /// A stable three-letter mono code from the quest name (letters only, padded).
+  static String _codeFor(String name) {
+    final letters = name.toUpperCase().replaceAll(RegExp('[^A-Z]'), '');
+    if (letters.length >= 3) return letters.substring(0, 3);
+    return letters.padRight(3, 'X');
   }
 }
 
@@ -261,14 +321,18 @@ class _AiRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Generate with AI',
+                  generated ? 'From "$_aiPrompt"' : 'Generate with AI',
                   style: AppType.trailTitle.copyWith(
                     color: AppColors.textPrimary,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'Describe a goal, get a quest chain back.',
+                  generated
+                      ? 'Edit anything before it joins your trail.'
+                      : 'Describe a goal, get a quest chain back.',
                   style: AppType.bodySmall,
                 ),
               ],
@@ -283,6 +347,75 @@ class _AiRow extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// The four AI-generated quests plus the "Add all four" action.
+class _GeneratedList extends StatelessWidget {
+  const _GeneratedList({required this.mode, required this.onAddAll});
+
+  final DifficultyMode mode;
+  final VoidCallback onAddAll;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: Gap.md),
+        ..._generated.map((g) {
+          final reward = XpRules.reward(g.diff, mode);
+          return Container(
+            margin: const EdgeInsets.only(bottom: Gap.xs),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(Radii.trailCard),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: Row(
+              children: [
+                Text(
+                  g.code,
+                  style: AppType.code.copyWith(
+                    color: AppColors.difficulty[g.diff.index],
+                  ),
+                ),
+                const SizedBox(width: Gap.md),
+                Expanded(
+                  child: Text(
+                    g.name,
+                    style: AppType.trailTitle.copyWith(
+                      color: AppColors.textPrimary,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Text(
+                  '+$reward',
+                  style: AppType.value.copyWith(color: AppColors.accent),
+                ),
+              ],
+            ),
+          );
+        }),
+        const SizedBox(height: Gap.sm),
+        GestureDetector(
+          onTap: onAddAll,
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 13),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: AppColors.accent,
+              borderRadius: BorderRadius.circular(Radii.button),
+            ),
+            child: Text('Add all four', style: AppType.buttonPrimary),
+          ),
+        ),
+      ],
     );
   }
 }

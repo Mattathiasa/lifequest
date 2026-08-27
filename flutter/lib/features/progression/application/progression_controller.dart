@@ -3,6 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../domain/progression_state.dart';
 import '../domain/xp_rules.dart';
 
+/// Sentinel so [OverlayState.copyWith] can tell "leave unchanged" apart from
+/// "set to null" — both `flash` and `levelUp` use `null` as a real value.
+const Object _unset = Object();
+
 /// State for overlay events — complete flash and level-up.
 class OverlayState {
   const OverlayState({this.flash, this.levelUp});
@@ -10,8 +14,13 @@ class OverlayState {
   final ({int xp, String name})? flash;
   final int? levelUp; // previous level when level-up queued
 
-  OverlayState copyWith({({int xp, String name})? flash, int? levelUp}) {
-    return OverlayState(flash: flash, levelUp: levelUp);
+  OverlayState copyWith({Object? flash = _unset, Object? levelUp = _unset}) {
+    return OverlayState(
+      flash: identical(flash, _unset)
+          ? this.flash
+          : flash as ({int xp, String name})?,
+      levelUp: identical(levelUp, _unset) ? this.levelUp : levelUp as int?,
+    );
   }
 }
 

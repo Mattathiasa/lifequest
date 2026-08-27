@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- LifeQuest "LQ" monogram — lime on canvas. Reused by the adaptive icon
+     foreground and the launch splash. Drawn as filled paths so it needs no
+     raster assets and stays crisp at any size. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- L -->
+    <path
+        android:fillColor="#C7F022"
+        android:pathData="M38,40 L48,40 L48,60 L58,60 L58,68 L38,68 Z" />
+    <!-- Q disc -->
+    <path
+        android:fillColor="#C7F022"
+        android:pathData="M53,53 a14,14 0 1,0 28,0 a14,14 0 1,0 -28,0 Z" />
+    <!-- Q tail -->
+    <path
+        android:fillColor="#C7F022"
+        android:pathData="M70,63 L80,75 L75,79 L65,67 Z" />
+    <!-- Q counter (canvas) — reads as a ring over the canvas background -->
+    <path
+        android:fillColor="#05070A"
+        android:pathData="M60.5,53 a6.5,6.5 0 1,0 13,0 a6.5,6.5 0 1,0 -13,0 Z" />
+</vector>

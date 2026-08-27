@@ -39,6 +39,19 @@ extension DifficultyModeX on DifficultyMode {
     DifficultyMode.balanced => 1.0,
     DifficultyMode.hardcore => 0.7,
   };
+
+  String get label => switch (this) {
+    DifficultyMode.casual => 'Casual',
+    DifficultyMode.balanced => 'Balanced',
+    DifficultyMode.hardcore => 'Hardcore',
+  };
+
+  /// One-line description of what the mode does to rewards.
+  String get blurb => switch (this) {
+    DifficultyMode.casual => 'Bigger rewards, gentler pace.',
+    DifficultyMode.balanced => 'Rewards as designed.',
+    DifficultyMode.hardcore => 'Leaner rewards, higher stakes.',
+  };
 }
 
 /// Result of awarding XP: the new position plus how many levels were crossed.

@@ -5,7 +5,11 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/utils/formatters.dart';
+import '../../../core/utils/haptics.dart';
+import '../../../core/widgets/glass_sheet.dart';
 import '../../progression/application/progression_controller.dart';
+import '../../progression/domain/xp_rules.dart';
+import '../../settings/application/settings_controller.dart';
 
 class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
@@ -13,6 +17,9 @@ class ProfilePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final prog = ref.watch(progressionStateProvider);
+    final displayName = ref.watch(displayNameProvider);
+    final initials = ref.watch(initialsProvider);
+    final mode = ref.watch(difficultyModeProvider);
 
     return Container(
       decoration: const BoxDecoration(gradient: AppColors.screen),
@@ -42,7 +49,7 @@ class ProfilePage extends ConsumerWidget {
                           border: Border.all(color: AppColors.accentBorder),
                         ),
                         child: Text(
-                          'MA',
+                          initials,
                           style: AppType.heroLevel.copyWith(
                             color: AppColors.accent,
                             fontSize: 20,
@@ -54,7 +61,7 @@ class ProfilePage extends ConsumerWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Matt Abraham', style: AppType.sheetTitle),
+                            Text(displayName, style: AppType.sheetTitle),
                             const SizedBox(height: 2),
                             Text('Disciplined Adventurer', style: AppType.body),
                           ],
@@ -110,12 +117,22 @@ class ProfilePage extends ConsumerWidget {
                         _SettingsRow(
                           icon: Icons.signal_cellular_alt,
                           name: 'Difficulty',
-                          hint: 'Balanced',
+                          hint: mode.label,
+                          onTap: () =>
+                              _showDifficultyPicker(context, ref, mode),
                         ),
                         _SettingsRow(
                           icon: Icons.lock_outline,
                           name: 'Privacy',
                           hint: 'Data & security',
+                        ),
+                        _SettingsRow(
+                          icon: Icons.replay,
+                          name: 'Replay intro',
+                          hint: 'Run onboarding again',
+                          onTap: () => ref
+                              .read(settingsProvider.notifier)
+                              .replayOnboarding(),
                         ),
                         _SettingsRow(
                           icon: Icons.person_outline,
@@ -187,12 +204,14 @@ class _SettingsRow extends StatelessWidget {
     required this.icon,
     required this.name,
     required this.hint,
+    this.onTap,
     this.showDivider = true,
   });
 
   final IconData icon;
   final String name;
   final String hint;
+  final VoidCallback? onTap;
   final bool showDivider;
 
   @override
@@ -202,7 +221,7 @@ class _SettingsRow extends StatelessWidget {
         Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: () {},
+            onTap: onTap ?? () {},
             highlightColor: AppColors.accentSurface,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 18),
@@ -242,4 +261,75 @@ class _SettingsRow extends StatelessWidget {
       ],
     );
   }
+}
+
+/// Live difficulty picker — changing it re-computes every reward immediately.
+void _showDifficultyPicker(
+  BuildContext context,
+  WidgetRef ref,
+  DifficultyMode current,
+) {
+  showGlassSheet(
+    context,
+    builder: (_) => GlassSheet(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('DIFFICULTY SETS THE REWARD', style: AppType.eyebrow),
+          const SizedBox(height: Gap.md),
+          ...DifficultyMode.values.map((m) {
+            final selected = m == current;
+            return GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                AppHaptics.selection();
+                ref.read(settingsProvider.notifier).setDifficulty(m);
+                Navigator.of(context).pop();
+              },
+              child: Container(
+                margin: const EdgeInsets.only(bottom: Gap.sm),
+                padding: const EdgeInsets.all(Pad.card),
+                decoration: BoxDecoration(
+                  color: selected ? AppColors.accentSurface : AppColors.surface,
+                  borderRadius: BorderRadius.circular(Radii.input),
+                  border: Border.all(
+                    color: selected ? AppColors.accent : AppColors.border,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            m.label,
+                            style: AppType.cardTitle.copyWith(
+                              color: selected
+                                  ? AppColors.accent
+                                  : AppColors.textPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(m.blurb, style: AppType.bodySmall),
+                        ],
+                      ),
+                    ),
+                    Text(
+                      '×${m.multiplier}',
+                      style: AppType.metaLabel.copyWith(
+                        color: selected ? AppColors.accent : AppColors.slate,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }),
+          SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
+        ],
+      ),
+    ),
+  );
 }

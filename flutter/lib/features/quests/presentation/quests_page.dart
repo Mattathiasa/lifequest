@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/navigation/nav_providers.dart';
 import '../../../core/widgets/category_chip.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/segment_tabs.dart';
@@ -11,6 +12,7 @@ import '../../focus/presentation/focus_run_sheet.dart';
 import '../../progression/domain/xp_rules.dart';
 import '../../quests/application/quest_providers.dart';
 import '../../quests/domain/quest.dart';
+import '../../settings/application/settings_controller.dart';
 import 'create_quest_sheet.dart';
 
 /// Quest board page — full backlog, filterable, with new-quest creation.
@@ -22,7 +24,6 @@ class QuestsPage extends ConsumerStatefulWidget {
 }
 
 class _QuestsPageState extends ConsumerState<QuestsPage> {
-  int _tabIndex = 0;
   String _category = 'All';
 
   static const _tabs = ['Today', 'Upcoming', 'Recurring', 'Completed'];
@@ -47,10 +48,12 @@ class _QuestsPageState extends ConsumerState<QuestsPage> {
   @override
   Widget build(BuildContext context) {
     final quests = ref.watch(questListProvider);
+    final mode = ref.watch(difficultyModeProvider);
+    final tabIndex = ref.watch(boardTabProvider);
     final activeCount = quests.where((q) => !q.done).length;
 
     // Filter quests
-    final tab = _tabs[_tabIndex];
+    final tab = _tabs[tabIndex];
     final filtered = quests.where((q) {
       final scheduleMatch = switch (tab) {
         'Today' => q.schedule == QuestSchedule.today && !q.done,
@@ -108,8 +111,8 @@ class _QuestsPageState extends ConsumerState<QuestsPage> {
                   // Segment tabs
                   SegmentTabs(
                     tabs: _tabs,
-                    activeIndex: _tabIndex,
-                    onTap: (i) => setState(() => _tabIndex = i),
+                    activeIndex: tabIndex,
+                    onTap: (i) => ref.read(boardTabProvider.notifier).state = i,
                   ),
 
                   const SizedBox(height: Gap.md),
@@ -142,8 +145,11 @@ class _QuestsPageState extends ConsumerState<QuestsPage> {
                     )
                   else
                     ...filtered.map(
-                      (q) =>
-                          _BoardQuestCard(quest: q, onTap: () => _openQuest(q)),
+                      (q) => _BoardQuestCard(
+                        quest: q,
+                        mode: mode,
+                        onTap: () => _openQuest(q),
+                      ),
                     ),
 
                   const SizedBox(height: 100), // bottom nav clearance
@@ -166,15 +172,21 @@ class _QuestsPageState extends ConsumerState<QuestsPage> {
 }
 
 class _BoardQuestCard extends StatelessWidget {
-  const _BoardQuestCard({required this.quest, required this.onTap});
+  const _BoardQuestCard({
+    required this.quest,
+    required this.mode,
+    required this.onTap,
+  });
 
   final Quest quest;
+  final DifficultyMode mode;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final isDone = quest.done;
     final diffColor = AppColors.difficulty[quest.difficulty.index];
+    final reward = XpRules.reward(quest.difficulty, mode);
 
     return GestureDetector(
       onTap: isDone ? null : onTap,
@@ -238,7 +250,7 @@ class _BoardQuestCard extends StatelessWidget {
               const SizedBox(width: Gap.sm),
               // XP
               Text(
-                '+${quest.xp}',
+                '+$reward',
                 style: AppType.value.copyWith(
                   color: isDone ? AppColors.muted : AppColors.accent,
                 ),

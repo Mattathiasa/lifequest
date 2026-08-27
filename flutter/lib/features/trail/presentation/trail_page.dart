@@ -14,6 +14,7 @@ import '../../progression/application/progression_controller.dart';
 import '../../progression/domain/xp_rules.dart';
 import '../../quests/application/quest_providers.dart';
 import '../../quests/domain/quest.dart';
+import '../../settings/application/settings_controller.dart';
 
 /// Trail (Home) screen — "where am I in today's journey".
 class TrailPage extends ConsumerStatefulWidget {
@@ -40,6 +41,10 @@ class _TrailPageState extends ConsumerState<TrailPage> {
   Widget build(BuildContext context) {
     final quests = ref.watch(questListProvider);
     final prog = ref.watch(progressionStateProvider);
+    final mode = ref.watch(difficultyModeProvider);
+    final displayName = ref.watch(displayNameProvider);
+    final initials = ref.watch(initialsProvider);
+    final firstName = displayName.split(RegExp(r'\s+')).first;
 
     final todayQuests = quests
         .where((q) => q.schedule == QuestSchedule.today)
@@ -108,7 +113,10 @@ class _TrailPageState extends ConsumerState<TrailPage> {
                           children: [
                             Text(dateLine, style: AppType.metaLabel),
                             const SizedBox(height: 2),
-                            Text('$greeting, Matt', style: AppType.screenTitle),
+                            Text(
+                              '$greeting, $firstName',
+                              style: AppType.screenTitle,
+                            ),
                             const SizedBox(height: 2),
                             Text(nextUp, style: AppType.body),
                           ],
@@ -125,7 +133,7 @@ class _TrailPageState extends ConsumerState<TrailPage> {
                           border: Border.all(color: AppColors.borderStrong),
                         ),
                         child: Text(
-                          'MA',
+                          initials,
                           style: AppType.value.copyWith(
                             color: AppColors.accent,
                             fontSize: 13,
@@ -187,6 +195,7 @@ class _TrailPageState extends ConsumerState<TrailPage> {
                         nodeLabel: label,
                         nodeState: state,
                         quest: q,
+                        mode: mode,
                         isFirst: i == 0,
                         isLast: i == todayQuests.length - 1,
                         trailPct: trailPct,
@@ -244,8 +253,11 @@ class _TrailPageState extends ConsumerState<TrailPage> {
     final notifier = ref.read(progressionProvider.notifier);
     final questNotifier = ref.read(questListProvider.notifier);
 
-    // Compute XP reward
-    final xp = XpRules.reward(quest.difficulty, DifficultyMode.balanced);
+    // Compute XP reward using the chosen difficulty mode
+    final xp = XpRules.reward(
+      quest.difficulty,
+      ref.read(difficultyModeProvider),
+    );
 
     // Complete the quest
     await questNotifier.complete(quest.id);
@@ -398,6 +410,7 @@ class _TrailRow extends StatelessWidget {
     required this.nodeLabel,
     required this.nodeState,
     required this.quest,
+    required this.mode,
     required this.isFirst,
     required this.isLast,
     required this.trailPct,
@@ -411,6 +424,7 @@ class _TrailRow extends StatelessWidget {
   final String nodeLabel;
   final String nodeState;
   final Quest quest;
+  final DifficultyMode mode;
   final bool isFirst;
   final bool isLast;
   final double trailPct;
@@ -424,8 +438,7 @@ class _TrailRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final category = quest.category.uppercase;
     final meta = '$category · ${quest.time}';
-    final xpLabel =
-        '+${XpRules.reward(quest.difficulty, DifficultyMode.balanced)}';
+    final xpLabel = '+${XpRules.reward(quest.difficulty, mode)}';
 
     return IntrinsicHeight(
       child: Row(
@@ -614,83 +627,143 @@ class _RewardNode extends StatelessWidget {
 
 // ── Side quest card ─────────────────────────────────────────────────────────
 
-class _SideQuestCard extends StatelessWidget {
+class _SideQuestCard extends StatefulWidget {
   const _SideQuestCard({required this.accepted, required this.onAccept});
 
   final bool accepted;
   final VoidCallback? onAccept;
 
   @override
+  State<_SideQuestCard> createState() => _SideQuestCardState();
+}
+
+class _SideQuestCardState extends State<_SideQuestCard>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _drift;
+
+  @override
+  void initState() {
+    super.initState();
+    _drift = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 6),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _drift.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(Pad.cardLoose),
-      decoration: BoxDecoration(
-        gradient: AppColors.sideQuestCard,
-        borderRadius: BorderRadius.circular(Radii.hero),
-        border: Border.all(color: AppColors.accent.withValues(alpha: 0.28)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Eyebrow row
-          Row(
-            children: [
-              Flexible(
-                child: Text(
-                  'SIDE QUEST · RARE',
-                  style: AppType.eyebrow,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              const SizedBox(width: Gap.sm),
-              Text('expires 23:59', style: AppType.metaLabel),
-            ],
-          ),
-          const SizedBox(height: Gap.md),
-          // Headline
-          Text(
-            'Do the one thing you\'ve been avoiding.',
-            style: AppType.headline,
-          ),
-          const SizedBox(height: Gap.lg),
-          // Footer
-          Row(
-            children: [
-              Text(
-                '+300',
-                style: AppType.statValue.copyWith(
-                  color: AppColors.accent,
-                  fontSize: 20,
-                ),
-              ),
-              const Spacer(),
-              Flexible(
-                child: GestureDetector(
-                  onTap: accepted ? null : onAccept,
+    final accepted = widget.accepted;
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(Radii.hero),
+      child: Container(
+        padding: const EdgeInsets.all(Pad.cardLoose),
+        decoration: BoxDecoration(
+          gradient: AppColors.sideQuestCard,
+          borderRadius: BorderRadius.circular(Radii.hero),
+          border: Border.all(color: AppColors.accent.withValues(alpha: 0.28)),
+        ),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            // Drifting accent blob, top-right (±6px over 6s)
+            Positioned(
+              top: -34,
+              right: -24,
+              child: AnimatedBuilder(
+                animation: _drift,
+                builder: (_, _) => Transform.translate(
+                  offset: Offset(0, _drift.value * 12 - 6),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 11,
-                    ),
+                    width: 130,
+                    height: 130,
                     decoration: BoxDecoration(
-                      color: accepted ? Colors.transparent : AppColors.accent,
-                      borderRadius: BorderRadius.circular(Radii.button),
-                      border: accepted
-                          ? Border.all(color: AppColors.accent)
-                          : null,
-                    ),
-                    child: Text(
-                      accepted ? 'Accepted' : 'Accept',
-                      style: AppType.buttonPrimary.copyWith(
-                        color: accepted ? AppColors.accent : AppColors.canvas,
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [
+                          AppColors.accent.withValues(alpha: 0.18),
+                          AppColors.accent.withValues(alpha: 0.0),
+                        ],
                       ),
                     ),
                   ),
                 ),
               ),
-            ],
-          ),
-        ],
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Eyebrow row
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        'SIDE QUEST · RARE',
+                        style: AppType.eyebrow,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: Gap.sm),
+                    Text('expires 23:59', style: AppType.metaLabel),
+                  ],
+                ),
+                const SizedBox(height: Gap.md),
+                // Headline
+                Text(
+                  'Do the one thing you\'ve been avoiding.',
+                  style: AppType.headline,
+                ),
+                const SizedBox(height: Gap.lg),
+                // Footer
+                Row(
+                  children: [
+                    Text(
+                      '+300',
+                      style: AppType.statValue.copyWith(
+                        color: AppColors.accent,
+                        fontSize: 20,
+                      ),
+                    ),
+                    const Spacer(),
+                    Flexible(
+                      child: GestureDetector(
+                        onTap: accepted ? null : widget.onAccept,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 11,
+                          ),
+                          decoration: BoxDecoration(
+                            color: accepted
+                                ? Colors.transparent
+                                : AppColors.accent,
+                            borderRadius: BorderRadius.circular(Radii.button),
+                            border: accepted
+                                ? Border.all(color: AppColors.accent)
+                                : null,
+                          ),
+                          child: Text(
+                            accepted ? 'Accepted' : 'Accept',
+                            style: AppType.buttonPrimary.copyWith(
+                              color: accepted
+                                  ? AppColors.accent
+                                  : AppColors.canvas,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

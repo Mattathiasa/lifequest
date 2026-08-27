@@ -5,10 +5,11 @@ import '../../features/progression/application/progression_controller.dart';
 import '../../features/progression/presentation/complete_overlay.dart';
 import '../../features/progression/presentation/level_up_overlay.dart';
 import '../../features/trail/presentation/trail_page.dart';
-import '../../features/placeholder/presentation/quests_page.dart';
-import '../../features/placeholder/presentation/character_page.dart';
-import '../../features/placeholder/presentation/progress_page.dart';
-import '../../features/placeholder/presentation/profile_page.dart';
+import '../../features/quests/presentation/quests_page.dart';
+import '../../features/character/presentation/character_page.dart';
+import '../../features/progress/presentation/progress_page.dart';
+import '../../features/profile/presentation/profile_page.dart';
+import '../navigation/nav_providers.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_typography.dart';
 import '../utils/haptics.dart';
@@ -34,8 +35,6 @@ class AppShell extends ConsumerStatefulWidget {
 }
 
 class _AppShellState extends ConsumerState<AppShell> {
-  int _activeIndex = 0;
-
   static final _pages = <Widget>[
     const TrailPage(),
     const QuestsPage(),
@@ -47,6 +46,7 @@ class _AppShellState extends ConsumerState<AppShell> {
   @override
   Widget build(BuildContext context) {
     final overlay = ref.watch(overlayProvider);
+    final activeIndex = ref.watch(navIndexProvider);
 
     // Schedule overlay events after the current frame to avoid setState-during-build.
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -67,13 +67,13 @@ class _AppShellState extends ConsumerState<AppShell> {
       body: Stack(
         children: [
           // Pages
-          IndexedStack(index: _activeIndex, children: _pages),
+          IndexedStack(index: activeIndex, children: _pages),
           // Overlays are managed via Navigator (showDialog) in the callback above.
         ],
       ),
       bottomNavigationBar: _BottomNav(
-        activeIndex: _activeIndex,
-        onTap: (i) => setState(() => _activeIndex = i),
+        activeIndex: activeIndex,
+        onTap: (i) => ref.read(navIndexProvider.notifier).state = i,
       ),
     );
   }
