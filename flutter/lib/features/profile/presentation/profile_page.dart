@@ -93,6 +93,17 @@ class ProfilePage extends ConsumerWidget {
                     ],
                   ),
 
+                  const SizedBox(height: Gap.md),
+
+                  // Streak freeze section
+                  _StreakFreezeCard(
+                    freezes: prog.streakFreezes,
+                    canUse: prog.canUseStreakFreeze,
+                    streak: prog.streak,
+                    onUseFreeze: () => ref.read(progressionProvider.notifier).useStreakFreeze(),
+                    onBuyFreeze: () => _showBuyFreezeSheet(context, ref),
+                  ),
+
                   const SizedBox(height: Gap.xl),
 
                   // Settings list
@@ -199,6 +210,102 @@ class _ProfileStat extends StatelessWidget {
   }
 }
 
+class _StreakFreezeCard extends StatelessWidget {
+  const _StreakFreezeCard({
+    required this.freezes,
+    required this.canUse,
+    required this.streak,
+    required this.onUseFreeze,
+    required this.onBuyFreeze,
+  });
+
+  final int freezes;
+  final bool canUse;
+  final int streak;
+  final VoidCallback onUseFreeze;
+  final VoidCallback onBuyFreeze;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(Radii.card),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Text('❄️', style: TextStyle(fontSize: 20)),
+              const SizedBox(width: Gap.sm),
+              Text('Streak Freezes', style: AppType.cardTitle),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppColors.accentSurface,
+                  borderRadius: BorderRadius.circular(Radii.iconTile),
+                ),
+                child: Text(
+                  '$freezes',
+                  style: AppType.value.copyWith(color: AppColors.accent),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: Gap.sm),
+          Text(
+            'Protect your $streak-day streak if you miss a day.',
+            style: AppType.bodySmall.copyWith(color: AppColors.slate),
+          ),
+          const SizedBox(height: Gap.md),
+          Row(
+            children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: canUse ? onUseFreeze : null,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: canUse ? AppColors.accent : AppColors.trackInactive,
+                      borderRadius: BorderRadius.circular(Radii.button),
+                    ),
+                    child: Text(
+                      'Use freeze',
+                      style: AppType.buttonPrimary.copyWith(
+                        color: canUse ? AppColors.canvas : AppColors.muted,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: Gap.sm),
+              Expanded(
+                child: GestureDetector(
+                  onTap: onBuyFreeze,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(Radii.button),
+                      border: Border.all(color: AppColors.borderStrong),
+                    ),
+                    child: Text('Get more', style: AppType.buttonSecondary),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _SettingsRow extends StatelessWidget {
   const _SettingsRow({
     required this.icon,
@@ -263,8 +370,7 @@ class _SettingsRow extends StatelessWidget {
   }
 }
 
-/// Live difficulty picker — changing it re-computes every reward immediately.
-void _showDifficultyPicker(
+/// Live difficulty picker — changing it re-computes every reward immediately.  void _showDifficultyPicker(
   BuildContext context,
   WidgetRef ref,
   DifficultyMode current,
@@ -327,6 +433,73 @@ void _showDifficultyPicker(
               ),
             );
           }),
+          SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
+        ],
+      ),
+    ),
+  );
+}
+
+void _showBuyFreezeSheet(BuildContext context, WidgetRef ref) {
+  showGlassSheet(
+    context,
+    builder: (_) => GlassSheet(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('STREAK FREEZES', style: AppType.eyebrow),
+          const SizedBox(height: Gap.md),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.accentSurface,
+              borderRadius: BorderRadius.circular(Radii.card),
+              border: Border.all(color: AppColors.accentBorder),
+            ),
+            child: Row(
+              children: [
+                const Text('❄️', style: TextStyle(fontSize: 24)),
+                const SizedBox(width: Gap.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Streak Freeze', style: AppType.cardTitle),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Protects your streak if you miss a day. Use it before midnight!',
+                        style: AppType.bodySmall,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: Gap.lg),
+          GestureDetector(
+            onTap: () {
+              ref.read(progressionProvider.notifier).addStreakFreeze();
+              Navigator.of(context).pop();
+            },
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: AppColors.accent,
+                borderRadius: BorderRadius.circular(Radii.buttonLarge),
+              ),
+              child: Text('Get a Freeze (+1)', style: AppType.buttonPrimary),
+            ),
+          ),
+          const SizedBox(height: Gap.sm),
+          Text(
+            'Earn freezes by completing weekly challenges or purchase them.',
+            style: AppType.bodySmall.copyWith(color: AppColors.muted),
+            textAlign: TextAlign.center,
+          ),
           SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
         ],
       ),

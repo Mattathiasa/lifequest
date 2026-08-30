@@ -118,25 +118,68 @@ class ProgressionController extends Notifier<ProgressionFullState> {
   }
 
   /// Claim the day-clear bonus. Idempotent per day; extends the streak (and
-  /// resets it if a day was missed).
+  /// resets it if a day was missed, unless a streak freeze is used).
   void claimDayBonus() {
     final p = state.progression;
     final now = DateTime.now();
     if (p.lastClearedDay != null && _sameDay(p.lastClearedDay!, now)) return;
+    
+    // Check if we can continue the streak
+    final yesterday = now.subtract(const Duration(days: 1));
     final continues =
         p.lastClearedDay != null &&
-        _sameDay(p.lastClearedDay!, now.subtract(const Duration(days: 1)));
-    final streak = continues ? p.streak + 1 : 1;
+        (_sameDay(p.lastClearedDay!, yesterday) ||
+         _sameDay(p.lastClearedDay!, now.subtract(const Duration(days: 2))));
+    
+    // If streak would break and we have a freeze, use it
+    final streakWouldBreak = !continues && p.streak > 0;
+    final useFreeze = streakWouldBreak && p.canUseStreakFreeze;
+    
+    final streak = (continues || useFreeze) ? p.streak + 1 : 1;
     state = state.copyWith(
       progression: p.copyWith(
         streak: streak,
         recordStreak: streak > p.recordStreak ? streak : p.recordStreak,
         lastClearedDay: now,
+        streakFreezes: useFreeze ? p.streakFreezes - 1 : p.streakFreezes,
+        lastStreakFreezeUsed: useFreeze ? now : p.lastStreakFreezeUsed,
       ),
     );
     _persist();
-    showFlash(xp: XpRules.dayClearBonus, name: 'Day cleared');
+    
+    if (useFreeze) {
+      showFlash(xp: XpRules.dayClearBonus, name: 'Streak freeze used!');
+    } else {
+      showFlash(xp: XpRules.dayClearBonus, name: 'Day cleared');
+    }
     _scheduleAward(XpRules.dayClearBonus);
+  }
+
+  /// Use a streak freeze to protect today's streak.
+  void useStreakFreeze() {
+    final p = state.progression;
+    if (!p.canUseStreakFreeze) return;
+    
+    final now = DateTime.now();
+    state = state.copyWith(
+      progression: p.copyWith(
+        streakFreezes: p.streakFreezes - 1,
+        lastStreakFreezeUsed: now,
+      ),
+    );
+    _persist();
+    showFlash(xp: 0, name: 'Streak freeze activated');
+  }
+
+  /// Add a streak freeze (e.g., from purchase or reward).
+  void addStreakFreeze() {
+    final p = state.progression;
+    state = state.copyWith(
+      progression: p.copyWith(
+        streakFreezes: p.streakFreezes + 1,
+      ),
+    );
+    _persist();
   }
 
   /// Accept the side quest — a flat XP reward through the same sequence.
