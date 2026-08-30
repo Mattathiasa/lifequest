@@ -4,7 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/utils/formatters.dart';
 import '../../progression/application/progression_controller.dart';
+import '../../progression/application/stats_providers.dart';
+import '../../progression/domain/stats.dart';
 
 class ProgressPage extends ConsumerWidget {
   const ProgressPage({super.key});
@@ -12,6 +15,23 @@ class ProgressPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final prog = ref.watch(progressionStateProvider);
+    final history = ref.watch(historyProvider);
+    final questsDone = ref.watch(questsDoneProvider);
+    final weekActiveRate = ref.watch(weekActiveRateProvider);
+    final now = DateTime.now();
+
+    // Compute real stats from history
+    final weeklyXp = GameStats.weeklyXp(history, now);
+    final totalWeeklyXp = weeklyXp.fold<int>(0, (sum, v) => sum + v);
+    final dailyCounts = GameStats.dailyCounts(history, now, days: 42);
+    final xpByCategory = GameStats.xpByCategory(history);
+    final totalXp = xpByCategory.values.fold<int>(0, (sum, v) => sum + v);
+
+    // Compute completion rate from daily counts (days with quests done)
+    final daysActive = dailyCounts.where((c) => c > 0).length;
+    final completionRate = daysActive > 0
+        ? ((daysActive / dailyCounts.length) * 100).round()
+        : 0;
 
     return Container(
       decoration: const BoxDecoration(gradient: AppColors.screen),
@@ -33,7 +53,7 @@ class ProgressPage extends ConsumerWidget {
                     children: [
                       Expanded(
                         child: _StatPanel(
-                          value: '86%',
+                          value: '$completionRate%',
                           label: 'COMPLETION',
                           color: AppColors.accent,
                         ),
@@ -47,7 +67,10 @@ class ProgressPage extends ConsumerWidget {
                       ),
                       const SizedBox(width: Gap.sm),
                       Expanded(
-                        child: _StatPanel(value: '31', label: 'RECORD'),
+                        child: _StatPanel(
+                          value: '${prog.recordStreak}',
+                          label: 'RECORD',
+                        ),
                       ),
                     ],
                   ),
@@ -59,9 +82,12 @@ class ProgressPage extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('4,180 TOTAL', style: AppType.eyebrow),
+                        Text(
+                          '${Formatters.thousands(totalWeeklyXp)} TOTAL',
+                          style: AppType.eyebrow,
+                        ),
                         const SizedBox(height: Gap.md),
-                        const _WeeklyXpChart(),
+                        _WeeklyXpChart(data: weeklyXp),
                       ],
                     ),
                   ),
@@ -73,7 +99,7 @@ class ProgressPage extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const _ConsistencyGrid(),
+                        _ConsistencyGrid(dailyCounts: dailyCounts),
                         const SizedBox(height: Gap.sm),
                         Text(
                           'LAST 6 WEEKS · LIME = QUESTS CLEARED',
@@ -92,35 +118,41 @@ class ProgressPage extends ConsumerWidget {
                       children: [
                         Text('WHERE YOUR XP GOES', style: AppType.eyebrow),
                         const SizedBox(height: Gap.md),
-                        _XpBreakdown(
-                          label: 'Health',
-                          pct: 38,
-                          color: AppColors.accent,
-                        ),
-                        const SizedBox(height: 10),
-                        _XpBreakdown(
-                          label: 'Learning',
-                          pct: 22,
-                          color: AppColors.accent.withValues(alpha: 0.7),
-                        ),
-                        const SizedBox(height: 10),
-                        _XpBreakdown(
-                          label: 'Productivity',
-                          pct: 19,
-                          color: AppColors.slate,
-                        ),
-                        const SizedBox(height: 10),
-                        _XpBreakdown(
-                          label: 'Mindfulness',
-                          pct: 13,
-                          color: AppColors.slate.withValues(alpha: 0.7),
-                        ),
-                        const SizedBox(height: 10),
-                        _XpBreakdown(
-                          label: 'Social',
-                          pct: 8,
-                          color: AppColors.muted,
-                        ),
+                        if (totalXp > 0) ...[
+                          _XpBreakdown(
+                            label: 'Health',
+                            pct: _catPct(xpByCategory, 'health', totalXp),
+                            color: AppColors.accent,
+                          ),
+                          const SizedBox(height: 10),
+                          _XpBreakdown(
+                            label: 'Learning',
+                            pct: _catPct(xpByCategory, 'learning', totalXp),
+                            color: AppColors.accent.withValues(alpha: 0.7),
+                          ),
+                          const SizedBox(height: 10),
+                          _XpBreakdown(
+                            label: 'Productivity',
+                            pct: _catPct(xpByCategory, 'productivity', totalXp),
+                            color: AppColors.slate,
+                          ),
+                          const SizedBox(height: 10),
+                          _XpBreakdown(
+                            label: 'Mindfulness',
+                            pct: _catPct(xpByCategory, 'mindfulness', totalXp),
+                            color: AppColors.slate.withValues(alpha: 0.7),
+                          ),
+                          const SizedBox(height: 10),
+                          _XpBreakdown(
+                            label: 'Social',
+                            pct: _catPct(xpByCategory, 'social', totalXp),
+                            color: AppColors.muted,
+                          ),
+                        ] else
+                          Text(
+                            'Complete quests to see your XP breakdown',
+                            style: AppType.body,
+                          ),
                       ],
                     ),
                   ),
@@ -128,26 +160,10 @@ class ProgressPage extends ConsumerWidget {
                   const SizedBox(height: Gap.md),
 
                   // Coach card
-                  Container(
-                    padding: const EdgeInsets.all(18),
-                    decoration: BoxDecoration(
-                      gradient: AppColors.heroCard,
-                      borderRadius: BorderRadius.circular(Radii.card),
-                      border: Border.all(color: AppColors.accentBorder),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('COACH', style: AppType.eyebrow),
-                        const SizedBox(height: Gap.sm),
-                        Text(
-                          'Your health quests are carrying the load. Try adding one Social quest this week to round things out.',
-                          style: AppType.body.copyWith(
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                      ],
-                    ),
+                  _CoachCard(
+                    xpByCategory: xpByCategory,
+                    totalXp: totalXp,
+                    streak: prog.streak,
                   ),
 
                   const SizedBox(height: 100), // bottom nav clearance
@@ -158,6 +174,17 @@ class ProgressPage extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  int _catPct(Map<dynamic, int> xpByCategory, String category, int totalXp) {
+    if (totalXp == 0) return 0;
+    final catXp = xpByCategory.values.elementAt(
+      xpByCategory.keys.toList().indexWhere(
+        (k) => k.name == category,
+        orElse: () => null,
+      ),
+    );
+    return totalXp > 0 ? ((catXp / totalXp) * 100).round() : 0;
   }
 }
 
@@ -213,15 +240,27 @@ class _PanelCard extends StatelessWidget {
 }
 
 class _WeeklyXpChart extends StatelessWidget {
-  const _WeeklyXpChart();
+  const _WeeklyXpChart({required this.data});
 
-  static const _data = [420, 610, 380, 720, 540, 910, 600];
-  static const _days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+  final List<int> data;
 
   @override
   Widget build(BuildContext context) {
-    final maxVal = _data.reduce((a, b) => a > b ? a : b);
-    final bestIdx = _data.indexOf(maxVal);
+    if (data.isEmpty || data.every((v) => v == 0)) {
+      return SizedBox(
+        height: 112,
+        child: Center(
+          child: Text(
+            'No XP data yet',
+            style: AppType.body,
+          ),
+        ),
+      );
+    }
+
+    final maxVal = data.reduce((a, b) => a > b ? a : b);
+    final bestIdx = data.indexOf(maxVal);
+    final labels = GameStats.weekdayLabels(DateTime.now());
 
     return Column(
       children: [
@@ -231,8 +270,8 @@ class _WeeklyXpChart extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: List.generate(7, (i) {
-              final h = (_data[i] / maxVal) * 112;
-              final isBest = i == bestIdx;
+              final h = maxVal > 0 ? (data[i] / maxVal) * 112 : 0.0;
+              final isBest = i == bestIdx && data[i] > 0;
               return Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -259,10 +298,10 @@ class _WeeklyXpChart extends StatelessWidget {
         // Day labels
         Row(
           children: List.generate(7, (i) {
-            final isBest = i == bestIdx;
+            final isBest = i == bestIdx && data[i] > 0;
             return Expanded(
               child: Text(
-                _days[i],
+                labels[i],
                 style: AppType.metaLabel.copyWith(
                   color: isBest ? AppColors.accent : AppColors.muted,
                 ),
@@ -277,64 +316,38 @@ class _WeeklyXpChart extends StatelessWidget {
 }
 
 class _ConsistencyGrid extends StatelessWidget {
-  const _ConsistencyGrid();
+  const _ConsistencyGrid({required this.dailyCounts});
 
-  // 14 columns × 3 rows, with random-ish intensity for mock data
-  static const _intensities = [
-    [
-      0.0,
-      0.75,
-      0.15,
-      1.0,
-      0.75,
-      0.0,
-      0.15,
-      1.0,
-      0.75,
-      0.15,
-      0.0,
-      1.0,
-      0.75,
-      0.15,
-    ],
-    [
-      0.15,
-      1.0,
-      0.75,
-      0.0,
-      0.15,
-      1.0,
-      0.75,
-      0.15,
-      0.0,
-      1.0,
-      0.75,
-      0.15,
-      0.0,
-      0.75,
-    ],
-    [
-      0.75,
-      0.15,
-      0.0,
-      0.75,
-      1.0,
-      0.15,
-      0.0,
-      0.75,
-      1.0,
-      0.15,
-      0.0,
-      0.75,
-      1.0,
-      0.15,
-    ],
-  ];
+  final List<int> dailyCounts;
 
   @override
   Widget build(BuildContext context) {
+    // Convert daily counts to intensity grid (14 columns × 3 rows)
+    final intensities = <List<double>>[];
+    for (var row = 0; row < 3; row++) {
+      final rowData = <double>[];
+      for (var col = 0; col < 14; col++) {
+        final idx = row * 14 + col;
+        if (idx < dailyCounts.length) {
+          final count = dailyCounts[idx];
+          // Map count to intensity: 0=none, 1-2=low, 3-4=medium, 5+=high
+          final intensity = count == 0
+              ? 0.0
+              : count <= 2
+                  ? 0.15
+                  : count <= 4
+                      ? 0.75
+                      : 1.0;
+          rowData.add(intensity);
+        } else {
+          rowData.add(0.0);
+        }
+      }
+      intensities.add(rowData);
+    }
+
     return Column(
-      children: _intensities.map((row) {
+      children: intensities.map((row) {
         return Padding(
           padding: const EdgeInsets.only(bottom: 5),
           child: Row(
@@ -409,6 +422,76 @@ class _XpBreakdown extends StatelessWidget {
           },
         ),
       ],
+    );
+  }
+}
+
+class _CoachCard extends StatelessWidget {
+  const _CoachCard({
+    required this.xpByCategory,
+    required this.totalXp,
+    required this.streak,
+  });
+
+  final Map<dynamic, int> xpByCategory;
+  final int totalXp;
+  final int streak;
+
+  @override
+  Widget build(BuildContext context) {
+    // Find the dominant category
+    String dominantCategory = 'Health';
+    int maxXP = 0;
+    for (final entry in xpByCategory.entries) {
+      if (entry.value > maxXP) {
+        maxXP = entry.value;
+        dominantCategory = entry.key.label;
+      }
+    }
+
+    // Find the weakest category
+    String weakestCategory = 'Social';
+    int minXP = totalXp;
+    for (final entry in xpByCategory.entries) {
+      if (entry.value < minXP) {
+        minXP = entry.value;
+        weakestCategory = entry.key.label;
+      }
+    }
+
+    // Generate coach message
+    String message;
+    if (totalXp == 0) {
+      message =
+          'Start completing quests to get personalized coaching recommendations.';
+    } else if (dominantCategory == weakestCategory) {
+      message =
+          'Great focus on $dominantCategory! Try diversifying your quests to build well-rounded skills.';
+    } else {
+      message =
+          'Your $dominantCategory quests are carrying the load. Try adding one $weakestCategory quest this week to round things out.';
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        gradient: AppColors.heroCard,
+        borderRadius: BorderRadius.circular(Radii.card),
+        border: Border.all(color: AppColors.accentBorder),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('COACH', style: AppType.eyebrow),
+          const SizedBox(height: Gap.sm),
+          Text(
+            message,
+            style: AppType.body.copyWith(
+              color: AppColors.textPrimary,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
