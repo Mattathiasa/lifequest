@@ -25,6 +25,8 @@ class QuestsPage extends ConsumerStatefulWidget {
 
 class _QuestsPageState extends ConsumerState<QuestsPage> {
   String _category = 'All';
+  String _searchQuery = '';
+  final _searchController = TextEditingController();
 
   static const _tabs = ['Today', 'Upcoming', 'Recurring', 'Completed'];
   static const _categories = [
@@ -63,7 +65,10 @@ class _QuestsPageState extends ConsumerState<QuestsPage> {
         _ => true,
       };
       final catMatch = _category == 'All' || q.category.label == _category;
-      return scheduleMatch && catMatch;
+      final searchMatch = _searchQuery.isEmpty ||
+          q.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+          q.desc.toLowerCase().contains(_searchQuery.toLowerCase());
+      return scheduleMatch && catMatch && searchMatch;
     }).toList();
 
     return Container(
@@ -140,6 +145,45 @@ class _QuestsPageState extends ConsumerState<QuestsPage> {
                   ),
 
                   const SizedBox(height: Gap.lg),
+
+                  // Search bar
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14),
+                    decoration: BoxDecoration(
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(Radii.input),
+                      border: Border.all(color: AppColors.borderStrong),
+                    ),
+                    child: TextField(
+                      controller: _searchController,
+                      style: AppType.body.copyWith(color: AppColors.textPrimary),
+                      decoration: InputDecoration(
+                        hintText: 'Search quests...',
+                        border: InputBorder.none,
+                        prefixIcon: const Icon(
+                          Icons.search,
+                          color: AppColors.muted,
+                          size: 20,
+                        ),
+                        suffixIcon: _searchQuery.isNotEmpty
+                            ? GestureDetector(
+                                onTap: () {
+                                  _searchController.clear();
+                                  setState(() => _searchQuery = '');
+                                },
+                                child: const Icon(
+                                  Icons.clear,
+                                  color: AppColors.muted,
+                                  size: 20,
+                                ),
+                              )
+                            : null,
+                      ),
+                      onChanged: (value) => setState(() => _searchQuery = value),
+                    ),
+                  ),
+
+                  const SizedBox(height: Gap.md),
 
                   // Quest list or empty state
                   if (filtered.isEmpty)
