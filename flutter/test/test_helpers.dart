@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lifequest/core/theme/app_theme.dart';
 import 'package:lifequest/features/progression/application/progression_controller.dart';
 import 'package:lifequest/features/progression/domain/progression_state.dart';
-import 'package:lifequest/features/quests/application/quest_providers.dart';
-import 'package:lifequest/features/settings/application/settings_controller.dart';
-import 'package:lifequest/features/settings/domain/app_settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Sets up SharedPreferences for testing.
@@ -17,7 +15,6 @@ Future<void> setupSharedPreferences() async {
 Widget createTestableApp({
   required Widget child,
   ProgressionState? progressionState,
-  AppSettings? settings,
 }) {
   return ProviderScope(
     overrides: [

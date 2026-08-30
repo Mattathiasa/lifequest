@@ -7,6 +7,7 @@ import '../../../core/theme/app_typography.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/xp_tick_bar.dart';
 import '../../../core/widgets/category_chip.dart';
+import '../../progression/application/achievement_providers.dart';
 import '../../progression/application/progression_controller.dart';
 import '../../settings/application/settings_controller.dart';
 
@@ -281,15 +282,6 @@ const _attributes = [
   ('FOCUS', 76),
 ];
 
-const _achievements = [
-  ('7 Day Streak', 'Earned Apr 2', true),
-  ('First Level Up', 'Earned Mar 8', true),
-  ('Quest Hunter', '68 / 100', false),
-  ('Night Owl', 'Earned Jun 19', true),
-  ('Perfect Week', '5 / 7 days', false),
-  ('Level 25', 'Locked', false),
-];
-
 class CharacterPage extends ConsumerStatefulWidget {
   const CharacterPage({super.key});
 
@@ -315,6 +307,7 @@ class _CharacterPageState extends ConsumerState<CharacterPage> {
   Widget build(BuildContext context) {
     final prog = ref.watch(progressionStateProvider);
     final initials = ref.watch(initialsProvider);
+    final achievements = ref.watch(achievementsProvider);
     final nodes = _skillTree[_skillBranch] ?? [];
     final selectedNode = _selectedNode < nodes.length
         ? nodes[_selectedNode]
@@ -515,8 +508,8 @@ class _CharacterPageState extends ConsumerState<CharacterPage> {
                     mainAxisSpacing: 10,
                     crossAxisSpacing: 10,
                     childAspectRatio: 1.8,
-                    children: _achievements.map((a) {
-                      final earned = a.$3;
+                    children: achievements.map((a) {
+                      final earned = a.earned;
                       return Container(
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
@@ -546,7 +539,7 @@ class _CharacterPageState extends ConsumerState<CharacterPage> {
                                 const SizedBox(width: 6),
                                 Expanded(
                                   child: Text(
-                                    a.$1,
+                                    a.name,
                                     style: TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w500,
@@ -561,7 +554,7 @@ class _CharacterPageState extends ConsumerState<CharacterPage> {
                               ],
                             ),
                             const SizedBox(height: 4),
-                            Text(a.$2, style: AppType.microLabel),
+                            Text(a.hint, style: AppType.microLabel),
                           ],
                         ),
                       );
