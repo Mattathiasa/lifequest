@@ -33,6 +33,18 @@ class QuestListNotifier extends Notifier<List<Quest>> {
     await repo.add(quest);
     state = [quest, ...state];
   }
+
+  Future<void> delete(int questId) async {
+    final repo = ref.read(questRepositoryProvider);
+    await repo.delete(questId);
+    state = [for (final q in state) if (q.id != questId) q];
+  }
+
+  Future<void> update(Quest quest) async {
+    final repo = ref.read(questRepositoryProvider);
+    await repo.update(quest);
+    state = [for (final q in state) if (q.id == quest.id) quest else q];
+  }
 }
 
 final questListProvider = NotifierProvider<QuestListNotifier, List<Quest>>(

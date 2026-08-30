@@ -23,6 +23,9 @@ abstract final class AppColors {
   static const muted = Color(0xFF4E5A70);
   static const faint = Color(0xFF2C3648);
 
+  // Semantic
+  static const error = Color(0xFFFF7A6B);
+
   // Difficulty
   static const difficultyEasy = slate;
   static const difficultyMedium = accent;

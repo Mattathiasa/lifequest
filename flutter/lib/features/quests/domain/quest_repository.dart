@@ -13,4 +13,10 @@ abstract class QuestRepository {
 
   /// Add a new quest.
   Future<void> add(Quest quest);
+
+  /// Update an existing quest.
+  Future<void> update(Quest quest);
+
+  /// Delete a quest by id.
+  Future<void> delete(int questId);
 }

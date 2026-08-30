@@ -19,6 +19,8 @@ class QuestCard extends StatelessWidget {
     this.onStartFocus,
     this.onDone,
     this.onTap,
+    this.onEdit,
+    this.onDelete,
   });
 
   final String code;
@@ -29,6 +31,8 @@ class QuestCard extends StatelessWidget {
   final VoidCallback? onStartFocus;
   final VoidCallback? onDone;
   final VoidCallback? onTap;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -96,13 +100,45 @@ class QuestCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: Gap.sm),
-                  // XP
-                  Text(
-                    xpLabel,
-                    style: AppType.value.copyWith(
-                      color: isCleared ? AppColors.muted : AppColors.accent,
+                  // XP + action buttons
+                  if (onEdit != null || onDelete != null)
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (onEdit != null)
+                          GestureDetector(
+                            onTap: onEdit,
+                            child: Container(
+                              padding: const EdgeInsets.all(6),
+                              child: const Icon(
+                                Icons.edit_outlined,
+                                size: 18,
+                                color: AppColors.muted,
+                              ),
+                            ),
+                          ),
+                        if (onDelete != null)
+                          GestureDetector(
+                            onTap: onDelete,
+                            child: Container(
+                              padding: const EdgeInsets.all(6),
+                              child: const Icon(
+                                Icons.delete_outline,
+                                size: 18,
+                                color: AppColors.error,
+                              ),
+                            ),
+                          ),
+                        const SizedBox(width: Gap.sm),
+                      ],
+                    )
+                  else
+                    Text(
+                      xpLabel,
+                      style: AppType.value.copyWith(
+                        color: isCleared ? AppColors.muted : AppColors.accent,
+                      ),
                     ),
-                  ),
                 ],
               ),
               // Action buttons — live card only

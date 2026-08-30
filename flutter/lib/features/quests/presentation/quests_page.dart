@@ -149,6 +149,8 @@ class _QuestsPageState extends ConsumerState<QuestsPage> {
                         quest: q,
                         mode: mode,
                         onTap: () => _openQuest(q),
+                        onEdit: () => _openEditSheet(q),
+                        onDelete: () => _confirmDelete(q),
                       ),
                     ),
 
@@ -169,6 +171,40 @@ class _QuestsPageState extends ConsumerState<QuestsPage> {
   void _openCreateSheet(BuildContext context) {
     showCreateQuestSheet(context);
   }
+
+  void _openEditSheet(Quest quest) {
+    showCreateQuestSheet(context, quest: quest);
+  }
+
+  void _confirmDelete(Quest quest) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.sheetTop,
+        title: Text('Delete quest?', style: AppType.screenTitle),
+        content: Text(
+          'This will permanently remove "${quest.name}".',
+          style: AppType.body,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text('Cancel', style: AppType.buttonSecondary),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              ref.read(questListProvider.notifier).delete(quest.id);
+            },
+            child: Text(
+              'Delete',
+              style: AppType.buttonSecondary.copyWith(color: AppColors.error),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _BoardQuestCard extends StatelessWidget {
@@ -176,11 +212,15 @@ class _BoardQuestCard extends StatelessWidget {
     required this.quest,
     required this.mode,
     required this.onTap,
+    required this.onEdit,
+    required this.onDelete,
   });
 
   final Quest quest;
   final DifficultyMode mode;
   final VoidCallback onTap;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -190,6 +230,7 @@ class _BoardQuestCard extends StatelessWidget {
 
     return GestureDetector(
       onTap: isDone ? null : onTap,
+      onLongPress: isDone ? null : onDelete,
       child: Container(
         margin: const EdgeInsets.only(bottom: Gap.sm),
         padding: const EdgeInsets.all(14),
@@ -248,12 +289,37 @@ class _BoardQuestCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: Gap.sm),
-              // XP
-              Text(
-                '+$reward',
-                style: AppType.value.copyWith(
-                  color: isDone ? AppColors.muted : AppColors.accent,
-                ),
+              // XP + action buttons
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    '+$reward',
+                    style: AppType.value.copyWith(
+                      color: isDone ? AppColors.muted : AppColors.accent,
+                    ),
+                  ),
+                  if (!isDone) ...[
+                    const SizedBox(width: Gap.sm),
+                    GestureDetector(
+                      onTap: onEdit,
+                      child: const Icon(
+                        Icons.edit_outlined,
+                        size: 18,
+                        color: AppColors.muted,
+                      ),
+                    ),
+                    const SizedBox(width: Gap.xs),
+                    GestureDetector(
+                      onTap: onDelete,
+                      child: const Icon(
+                        Icons.delete_outline,
+                        size: 18,
+                        color: AppColors.muted,
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ],
           ),

@@ -154,4 +154,15 @@ class InMemoryQuestRepository implements QuestRepository {
   Future<void> add(Quest quest) async {
     _quests.insert(0, quest);
   }
+
+  @override
+  Future<void> update(Quest quest) async {
+    final idx = _quests.indexWhere((q) => q.id == quest.id);
+    if (idx != -1) _quests[idx] = quest;
+  }
+
+  @override
+  Future<void> delete(int questId) async {
+    _quests.removeWhere((q) => q.id == questId);
+  }
 }

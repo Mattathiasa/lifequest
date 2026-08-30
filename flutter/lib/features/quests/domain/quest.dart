@@ -29,17 +29,27 @@ class Quest {
   /// Computed XP reward for this quest (balanced mode).
   int get xp => XpRules.reward(difficulty, DifficultyMode.balanced);
 
-  Quest copyWith({bool? done}) {
+  Quest copyWith({
+    String? code,
+    String? name,
+    String? desc,
+    QuestCategory? category,
+    QuestDifficulty? difficulty,
+    String? time,
+    String? due,
+    QuestSchedule? schedule,
+    bool? done,
+  }) {
     return Quest(
       id: id,
-      code: code,
-      name: name,
-      desc: desc,
-      category: category,
-      difficulty: difficulty,
-      time: time,
-      due: due,
-      schedule: schedule,
+      code: code ?? this.code,
+      name: name ?? this.name,
+      desc: desc ?? this.desc,
+      category: category ?? this.category,
+      difficulty: difficulty ?? this.difficulty,
+      time: time ?? this.time,
+      due: due ?? this.due,
+      schedule: schedule ?? this.schedule,
       done: done ?? this.done,
     );
   }

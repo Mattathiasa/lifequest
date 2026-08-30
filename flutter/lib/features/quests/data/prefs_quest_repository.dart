@@ -67,5 +67,23 @@ class PrefsQuestRepository implements QuestRepository {
     await _write(prefs, [quest, ...quests]);
   }
 
+  @override
+  Future<void> update(Quest quest) async {
+    final prefs = await SharedPreferences.getInstance();
+    final quests = await _read(prefs);
+    await _write(prefs, [
+      for (final q in quests) q.id == quest.id ? quest : q,
+    ]);
+  }
+
+  @override
+  Future<void> delete(int questId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final quests = await _read(prefs);
+    await _write(prefs, [
+      for (final q in quests) if (q.id != questId) q,
+    ]);
+  }
+
   static String _dayKey(DateTime d) => '${d.year}-${d.month}-${d.day}';
 }

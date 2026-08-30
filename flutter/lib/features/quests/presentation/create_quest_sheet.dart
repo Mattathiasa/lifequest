@@ -24,12 +24,17 @@ const _generated = <({String code, String name, QuestDifficulty diff})>[
 ];
 
 /// Opens the create quest sheet.
-void showCreateQuestSheet(BuildContext context) {
-  showGlassSheet(context, builder: (_) => const _CreateQuestSheetContent());
+void showCreateQuestSheet(BuildContext context, {Quest? quest}) {
+  showGlassSheet(
+    context,
+    builder: (_) => _CreateQuestSheetContent(questToEdit: quest),
+  );
 }
 
 class _CreateQuestSheetContent extends ConsumerStatefulWidget {
-  const _CreateQuestSheetContent();
+  const _CreateQuestSheetContent({this.questToEdit});
+
+  final Quest? questToEdit;
 
   @override
   ConsumerState<_CreateQuestSheetContent> createState() =>
@@ -38,15 +43,20 @@ class _CreateQuestSheetContent extends ConsumerStatefulWidget {
 
 class _CreateQuestSheetContentState
     extends ConsumerState<_CreateQuestSheetContent> {
-  final _nameController = TextEditingController();
-  QuestCategory _category = QuestCategory.productivity;
-  QuestDifficulty _difficulty = QuestDifficulty.medium;
+  late final TextEditingController _nameController;
+  late QuestCategory _category;
+  late QuestDifficulty _difficulty;
   bool _aiGenerated = false;
+
+  bool get _isEditing => widget.questToEdit != null;
 
   @override
   void initState() {
     super.initState();
-    // Rebuild as the user types so the "Add to trail" button enables/disables.
+    final quest = widget.questToEdit;
+    _nameController = TextEditingController(text: quest?.name ?? '');
+    _category = quest?.category ?? QuestCategory.productivity;
+    _difficulty = quest?.difficulty ?? QuestDifficulty.medium;
     _nameController.addListener(_onNameChanged);
   }
 
@@ -68,22 +78,32 @@ class _CreateQuestSheetContentState
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            // AI row
-            _AiRow(
-              generated: _aiGenerated,
-              onTryIt: () => setState(() => _aiGenerated = true),
-              onRedo: () => setState(() => _aiGenerated = false),
+            // Title
+            Text(
+              _isEditing ? 'Edit quest' : 'Create quest',
+              style: AppType.screenTitle,
             ),
 
-            // Generated quest chain
-            if (_aiGenerated)
-              _GeneratedList(mode: mode, onAddAll: _addAllGenerated),
-
-            const SizedBox(height: Gap.lg),
-            Divider(color: AppColors.borderHairline),
             const SizedBox(height: Gap.lg),
 
-            // Manual form
+            // AI row — only for create
+            if (!_isEditing) ...[
+              _AiRow(
+                generated: _aiGenerated,
+                onTryIt: () => setState(() => _aiGenerated = true),
+                onRedo: () => setState(() => _aiGenerated = false),
+              ),
+
+              // Generated quest chain
+              if (_aiGenerated)
+                _GeneratedList(mode: mode, onAddAll: _addAllGenerated),
+
+              const SizedBox(height: Gap.lg),
+              Divider(color: AppColors.borderHairline),
+              const SizedBox(height: Gap.lg),
+            ],
+
+            // Quest name
             Text('QUEST NAME', style: AppType.eyebrow),
             const SizedBox(height: Gap.sm),
             TextField(
@@ -177,26 +197,13 @@ class _CreateQuestSheetContentState
               }).toList(),
             ),
 
-            const SizedBox(height: Gap.lg),
-
-            // Due & Repeat fields
-            Row(
-              children: [
-                Expanded(
-                  child: _FieldTile(label: 'DUE', value: 'Today · 8:00 PM'),
-                ),
-                const SizedBox(width: Gap.sm),
-                Expanded(
-                  child: _FieldTile(label: 'REPEAT', value: 'Daily'),
-                ),
-              ],
-            ),
-
             const SizedBox(height: Gap.xl),
 
-            // Add to trail button
+            // Action button
             GestureDetector(
-              onTap: _nameController.text.isNotEmpty ? _addQuest : null,
+              onTap: _nameController.text.isNotEmpty
+                  ? (_isEditing ? _updateQuest : _addQuest)
+                  : null,
               child: Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(vertical: 14),
@@ -208,7 +215,7 @@ class _CreateQuestSheetContentState
                   borderRadius: BorderRadius.circular(Radii.buttonLarge),
                 ),
                 child: Text(
-                  'Add to trail',
+                  _isEditing ? 'Save changes' : 'Add to trail',
                   style: AppType.buttonPrimary.copyWith(
                     color: _nameController.text.isNotEmpty
                         ? AppColors.canvas
@@ -242,6 +249,22 @@ class _CreateQuestSheetContentState
     );
 
     ref.read(questListProvider.notifier).add(quest);
+    Navigator.of(context).pop();
+  }
+
+  void _updateQuest() {
+    final name = _nameController.text.trim();
+    if (name.isEmpty) return;
+
+    final original = widget.questToEdit!;
+    final updated = original.copyWith(
+      code: _codeFor(name),
+      name: name,
+      category: _category,
+      difficulty: _difficulty,
+    );
+
+    ref.read(questListProvider.notifier).update(updated);
     Navigator.of(context).pop();
   }
 
