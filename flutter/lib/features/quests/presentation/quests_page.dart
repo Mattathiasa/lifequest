@@ -70,7 +70,11 @@ class _QuestsPageState extends ConsumerState<QuestsPage> {
       decoration: const BoxDecoration(gradient: AppColors.screen),
       child: SafeArea(
         bottom: false,
-        child: CustomScrollView(
+        child: RefreshIndicator(
+          onRefresh: _refresh,
+          color: AppColors.accent,
+          backgroundColor: AppColors.surface,
+          child: CustomScrollView(
           slivers: [
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: Gap.gutter),
@@ -160,6 +164,7 @@ class _QuestsPageState extends ConsumerState<QuestsPage> {
             ),
           ],
         ),
+        ),
       ),
     );
   }
@@ -174,6 +179,10 @@ class _QuestsPageState extends ConsumerState<QuestsPage> {
 
   void _openEditSheet(Quest quest) {
     showCreateQuestSheet(context, quest: quest);
+  }
+
+  Future<void> _refresh() async {
+    await ref.read(questListProvider.notifier).load();
   }
 
   void _confirmDelete(Quest quest) {

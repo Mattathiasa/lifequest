@@ -100,7 +100,11 @@ class _TrailPageState extends ConsumerState<TrailPage> {
       decoration: const BoxDecoration(gradient: AppColors.screen),
       child: SafeArea(
         bottom: false,
-        child: CustomScrollView(
+        child: RefreshIndicator(
+          onRefresh: _refresh,
+          color: AppColors.accent,
+          backgroundColor: AppColors.surface,
+          child: CustomScrollView(
           slivers: [
             SliverPadding(
               padding: const EdgeInsets.symmetric(
@@ -245,6 +249,7 @@ class _TrailPageState extends ConsumerState<TrailPage> {
             ),
           ],
         ),
+        ),
       ),
     );
   }
@@ -271,6 +276,10 @@ class _TrailPageState extends ConsumerState<TrailPage> {
   void _acceptSideQuest() {
     setState(() => _sideQuestAccepted = true);
     ref.read(progressionProvider.notifier).acceptSideQuest();
+  }
+
+  Future<void> _refresh() async {
+    await ref.read(questListProvider.notifier).load();
   }
 }
 
