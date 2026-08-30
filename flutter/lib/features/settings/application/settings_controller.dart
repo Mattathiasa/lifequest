@@ -48,6 +48,16 @@ class SettingsController extends AsyncNotifier<AppSettings> {
   /// Send the user back through onboarding (keeps difficulty/name as defaults).
   Future<void> replayOnboarding() =>
       _update(_current.copyWith(onboarded: false));
+
+  /// Toggle notifications on/off.
+  Future<void> toggleNotifications(bool enabled) async {
+    await _update(_current.copyWith(notificationsEnabled: enabled));
+  }
+
+  /// Set the reminder time.
+  Future<void> setReminderTime(int hour, int minute) async {
+    await _update(_current.copyWith(reminderHour: hour, reminderMinute: minute));
+  }
 }
 
 final settingsProvider = AsyncNotifierProvider<SettingsController, AppSettings>(

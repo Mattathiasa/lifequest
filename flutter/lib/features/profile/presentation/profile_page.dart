@@ -10,6 +10,7 @@ import '../../../core/widgets/glass_sheet.dart';
 import '../../progression/application/progression_controller.dart';
 import '../../progression/domain/xp_rules.dart';
 import '../../settings/application/settings_controller.dart';
+import '../../settings/domain/app_settings.dart';
 
 class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
@@ -124,6 +125,7 @@ class ProfilePage extends ConsumerWidget {
                           icon: Icons.notifications_outlined,
                           name: 'Notifications',
                           hint: 'Reminders, alerts',
+                          onTap: () => _showNotificationSettings(context, ref),
                         ),
                         _SettingsRow(
                           icon: Icons.signal_cellular_alt,
@@ -370,7 +372,8 @@ class _SettingsRow extends StatelessWidget {
   }
 }
 
-/// Live difficulty picker — changing it re-computes every reward immediately.  void _showDifficultyPicker(
+/// Live difficulty picker — changing it re-computes every reward immediately.
+void _showDifficultyPicker(
   BuildContext context,
   WidgetRef ref,
   DifficultyMode current,
@@ -505,4 +508,165 @@ void _showBuyFreezeSheet(BuildContext context, WidgetRef ref) {
       ),
     ),
   );
+}
+
+void _showNotificationSettings(BuildContext context, WidgetRef ref) {
+  final settings = ref.read(settingsProvider).valueOrNull ?? const AppSettings();
+  
+  showGlassSheet(
+    context,
+    builder: (_) => _NotificationSettingsSheet(settings: settings),
+  );
+}
+
+class _NotificationSettingsSheet extends ConsumerStatefulWidget {
+  const _NotificationSettingsSheet({required this.settings});
+
+  final AppSettings settings;
+
+  @override
+  ConsumerState<_NotificationSettingsSheet> createState() => _NotificationSettingsSheetState();
+}
+
+class _NotificationSettingsSheetState extends ConsumerState<_NotificationSettingsSheet> {
+  late bool _notificationsEnabled;
+  late int _reminderHour;
+  late int _reminderMinute;
+
+  @override
+  void initState() {
+    super.initState();
+    _notificationsEnabled = widget.settings.notificationsEnabled;
+    _reminderHour = widget.settings.reminderHour;
+    _reminderMinute = widget.settings.reminderMinute;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassSheet(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('NOTIFICATION SETTINGS', style: AppType.eyebrow),
+          const SizedBox(height: Gap.lg),
+
+          // Enable/disable toggle
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Daily Reminders', style: AppType.cardTitle),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Get reminded to complete your quests',
+                      style: AppType.bodySmall.copyWith(color: AppColors.slate),
+                    ),
+                  ],
+                ),
+              ),
+              Switch(
+                value: _notificationsEnabled,
+                onChanged: (value) {
+                  setState(() => _notificationsEnabled = value);
+                  _updateNotificationSettings();
+                },
+                activeThumbColor: AppColors.accent,
+                inactiveTrackColor: AppColors.trackInactive,
+              ),
+            ],
+          ),
+
+          const SizedBox(height: Gap.lg),
+
+          // Time picker
+          if (_notificationsEnabled) ...[
+            Text('REMINDER TIME', style: AppType.eyebrow),
+            const SizedBox(height: Gap.sm),
+            GestureDetector(
+              onTap: _pickTime,
+              child: Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(Radii.input),
+                  border: Border.all(color: AppColors.borderStrong),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.access_time, size: 20, color: AppColors.slate),
+                    const SizedBox(width: Gap.md),
+                    Text(
+                      '${_reminderHour.toString().padLeft(2, '0')}:${_reminderMinute.toString().padLeft(2, '0')}',
+                      style: AppType.body.copyWith(color: AppColors.textPrimary),
+                    ),
+                    const Spacer(),
+                    Icon(Icons.chevron_right, size: 20, color: AppColors.muted),
+                  ],
+                ),
+              ),
+            ),
+          ],
+
+          const SizedBox(height: Gap.xl),
+
+          // Save button
+          GestureDetector(
+            onTap: () {
+              _updateNotificationSettings();
+              Navigator.of(context).pop();
+            },
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: AppColors.accent,
+                borderRadius: BorderRadius.circular(Radii.buttonLarge),
+              ),
+              child: Text('Save', style: AppType.buttonPrimary),
+            ),
+          ),
+
+          SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
+        ],
+      ),
+    );
+  }
+
+  void _pickTime() async {
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay(hour: _reminderHour, minute: _reminderMinute),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            timePickerTheme: TimePickerThemeData(
+              backgroundColor: AppColors.sheetTop,
+              hourMinuteColor: AppColors.surface,
+              hourMinuteTextColor: AppColors.textPrimary,
+              dialHandColor: AppColors.accent,
+              dialBackgroundColor: AppColors.surface,
+              dialTextColor: AppColors.textPrimary,
+              entryModeIconColor: AppColors.accent,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (time != null) {
+      setState(() {
+        _reminderHour = time.hour;
+        _reminderMinute = time.minute;
+      });
+    }
+  }
+
+  void _updateNotificationSettings() {
+    ref.read(settingsProvider.notifier).toggleNotifications(_notificationsEnabled);
+    ref.read(settingsProvider.notifier).setReminderTime(_reminderHour, _reminderMinute);
+  }
 }

@@ -15,6 +15,9 @@ class PrefsSettingsRepository implements SettingsRepository {
   static const _kOnboarded = 'onboarded';
   static const _kDifficulty = 'difficultyMode';
   static const _kName = 'displayName';
+  static const _kNotificationsEnabled = 'notificationsEnabled';
+  static const _kReminderHour = 'reminderHour';
+  static const _kReminderMinute = 'reminderMinute';
 
   @override
   Future<AppSettings> load() async {
@@ -28,6 +31,9 @@ class PrefsSettingsRepository implements SettingsRepository {
         orElse: () => DifficultyMode.balanced,
       ),
       displayName: prefs.getString(_kName) ?? 'Adventurer',
+      notificationsEnabled: prefs.getBool(_kNotificationsEnabled) ?? false,
+      reminderHour: prefs.getInt(_kReminderHour) ?? 20,
+      reminderMinute: prefs.getInt(_kReminderMinute) ?? 0,
     );
   }
 
@@ -37,5 +43,8 @@ class PrefsSettingsRepository implements SettingsRepository {
     await prefs.setBool(_kOnboarded, settings.onboarded);
     await prefs.setString(_kDifficulty, settings.difficultyMode.name);
     await prefs.setString(_kName, settings.displayName);
+    await prefs.setBool(_kNotificationsEnabled, settings.notificationsEnabled);
+    await prefs.setInt(_kReminderHour, settings.reminderHour);
+    await prefs.setInt(_kReminderMinute, settings.reminderMinute);
   }
 }
