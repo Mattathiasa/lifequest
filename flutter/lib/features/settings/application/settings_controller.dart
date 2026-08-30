@@ -4,6 +4,7 @@ import '../../progression/domain/xp_rules.dart';
 import '../data/settings_repository.dart';
 import '../domain/app_settings.dart';
 
+
 final settingsRepositoryProvider = Provider<SettingsRepository>(
   (_) => PrefsSettingsRepository(),
 );
@@ -58,6 +59,11 @@ class SettingsController extends AsyncNotifier<AppSettings> {
   Future<void> setReminderTime(int hour, int minute) async {
     await _update(_current.copyWith(reminderHour: hour, reminderMinute: minute));
   }
+
+  /// Set the theme mode.
+  Future<void> setThemeMode(AppThemeMode mode) async {
+    await _update(_current.copyWith(themeMode: mode));
+  }
 }
 
 final settingsProvider = AsyncNotifierProvider<SettingsController, AppSettings>(
@@ -79,4 +85,9 @@ final displayNameProvider = Provider<String>((ref) {
 /// The player's avatar initials.
 final initialsProvider = Provider<String>((ref) {
   return ref.watch(settingsProvider).valueOrNull?.initials ?? 'A';
+});
+
+/// The current theme mode.
+final themeModeProvider = Provider<AppThemeMode>((ref) {
+  return ref.watch(settingsProvider).valueOrNull?.themeMode ?? AppThemeMode.dark;
 });

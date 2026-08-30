@@ -119,7 +119,8 @@ class ProfilePage extends ConsumerWidget {
                         _SettingsRow(
                           icon: Icons.dark_mode_outlined,
                           name: 'Appearance',
-                          hint: 'Dark mode, theme',
+                          hint: ref.watch(themeModeProvider).label,
+                          onTap: () => _showThemePicker(context, ref),
                         ),
                         _SettingsRow(
                           icon: Icons.notifications_outlined,
@@ -503,6 +504,69 @@ void _showBuyFreezeSheet(BuildContext context, WidgetRef ref) {
             style: AppType.bodySmall.copyWith(color: AppColors.muted),
             textAlign: TextAlign.center,
           ),
+          SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
+        ],
+      ),
+    ),
+  );
+}
+
+void _showThemePicker(BuildContext context, WidgetRef ref) {
+  final currentMode = ref.read(themeModeProvider);
+  
+  showGlassSheet(
+    context,
+    builder: (_) => GlassSheet(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('THEME MODE', style: AppType.eyebrow),
+          const SizedBox(height: Gap.md),
+          ...AppThemeMode.values.map((mode) {
+            final selected = mode == currentMode;
+            return GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                AppHaptics.selection();
+                ref.read(settingsProvider.notifier).setThemeMode(mode);
+                Navigator.of(context).pop();
+              },
+              child: Container(
+                margin: const EdgeInsets.only(bottom: Gap.sm),
+                padding: const EdgeInsets.all(Pad.card),
+                decoration: BoxDecoration(
+                  color: selected ? AppColors.accentSurface : AppColors.surface,
+                  borderRadius: BorderRadius.circular(Radii.input),
+                  border: Border.all(
+                    color: selected ? AppColors.accent : AppColors.border,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      mode == AppThemeMode.dark ? Icons.dark_mode_outlined :
+                      mode == AppThemeMode.light ? Icons.light_mode_outlined :
+                      Icons.phone_android_outlined,
+                      size: 20,
+                      color: selected ? AppColors.accent : AppColors.slate,
+                    ),
+                    const SizedBox(width: Gap.md),
+                    Expanded(
+                      child: Text(
+                        mode.label,
+                        style: AppType.cardTitle.copyWith(
+                          color: selected ? AppColors.accent : AppColors.textPrimary,
+                        ),
+                      ),
+                    ),
+                    if (selected)
+                      const Icon(Icons.check, size: 20, color: AppColors.accent),
+                  ],
+                ),
+              ),
+            );
+          }),
           SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
         ],
       ),

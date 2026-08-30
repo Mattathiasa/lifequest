@@ -1,4 +1,25 @@
+import 'package:flutter/material.dart';
+
 import '../../progression/domain/xp_rules.dart';
+
+/// Theme mode options.
+enum AppThemeMode {
+  dark,
+  light,
+  system;
+
+  String get label => switch (this) {
+    AppThemeMode.dark => 'Dark',
+    AppThemeMode.light => 'Light',
+    AppThemeMode.system => 'System',
+  };
+
+  ThemeMode get themeMode => switch (this) {
+    AppThemeMode.dark => ThemeMode.dark,
+    AppThemeMode.light => ThemeMode.light,
+    AppThemeMode.system => ThemeMode.system,
+  };
+}
 
 /// Persisted user settings — set during onboarding, editable in Profile.
 class AppSettings {
@@ -9,6 +30,7 @@ class AppSettings {
     this.notificationsEnabled = false,
     this.reminderHour = 20,
     this.reminderMinute = 0,
+    this.themeMode = AppThemeMode.dark,
   });
 
   final bool onboarded;
@@ -17,6 +39,7 @@ class AppSettings {
   final bool notificationsEnabled;
   final int reminderHour;
   final int reminderMinute;
+  final AppThemeMode themeMode;
 
   /// One- or two-letter avatar initials derived from [displayName].
   String get initials {
@@ -47,6 +70,7 @@ class AppSettings {
     bool? notificationsEnabled,
     int? reminderHour,
     int? reminderMinute,
+    AppThemeMode? themeMode,
   }) {
     return AppSettings(
       onboarded: onboarded ?? this.onboarded,
@@ -55,6 +79,7 @@ class AppSettings {
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
       reminderHour: reminderHour ?? this.reminderHour,
       reminderMinute: reminderMinute ?? this.reminderMinute,
+      themeMode: themeMode ?? this.themeMode,
     );
   }
 }

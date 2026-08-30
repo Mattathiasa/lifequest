@@ -14,10 +14,13 @@ class LifeQuestApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsProvider);
+    final themeMode = ref.watch(themeModeProvider);
     return MaterialApp(
       title: 'LifeQuest',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.dark,
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
+      themeMode: themeMode.themeMode,
       home: settings.when(
         data: (s) => s.onboarded ? const AppShell() : const OnboardingFlow(),
         loading: () => const _BrandSplash(),

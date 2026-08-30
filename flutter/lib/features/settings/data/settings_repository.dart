@@ -18,12 +18,14 @@ class PrefsSettingsRepository implements SettingsRepository {
   static const _kNotificationsEnabled = 'notificationsEnabled';
   static const _kReminderHour = 'reminderHour';
   static const _kReminderMinute = 'reminderMinute';
+  static const _kThemeMode = 'themeMode';
 
   @override
   Future<AppSettings> load() async {
     final prefs = await SharedPreferences.getInstance();
     final modeName =
         prefs.getString(_kDifficulty) ?? DifficultyMode.balanced.name;
+    final themeModeName = prefs.getString(_kThemeMode) ?? AppThemeMode.dark.name;
     return AppSettings(
       onboarded: prefs.getBool(_kOnboarded) ?? false,
       difficultyMode: DifficultyMode.values.firstWhere(
@@ -34,6 +36,10 @@ class PrefsSettingsRepository implements SettingsRepository {
       notificationsEnabled: prefs.getBool(_kNotificationsEnabled) ?? false,
       reminderHour: prefs.getInt(_kReminderHour) ?? 20,
       reminderMinute: prefs.getInt(_kReminderMinute) ?? 0,
+      themeMode: AppThemeMode.values.firstWhere(
+        (m) => m.name == themeModeName,
+        orElse: () => AppThemeMode.dark,
+      ),
     );
   }
 
@@ -46,5 +52,6 @@ class PrefsSettingsRepository implements SettingsRepository {
     await prefs.setBool(_kNotificationsEnabled, settings.notificationsEnabled);
     await prefs.setInt(_kReminderHour, settings.reminderHour);
     await prefs.setInt(_kReminderMinute, settings.reminderMinute);
+    await prefs.setString(_kThemeMode, settings.themeMode.name);
   }
 }
