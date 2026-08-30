@@ -442,33 +442,3 @@ class _GeneratedList extends StatelessWidget {
     );
   }
 }
-
-class _FieldTile extends StatelessWidget {
-  const _FieldTile({required this.label, required this.value});
-
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceRaised,
-        borderRadius: BorderRadius.circular(Radii.input),
-        border: Border.all(color: AppColors.borderStrong),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: AppType.eyebrow),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: AppType.body.copyWith(color: AppColors.textPrimary),
-          ),
-        ],
-      ),
-    );
-  }
-}

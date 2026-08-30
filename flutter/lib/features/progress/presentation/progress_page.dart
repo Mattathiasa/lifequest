@@ -6,7 +6,6 @@ import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/utils/formatters.dart';
 import '../../progression/application/progression_controller.dart';
-import '../../progression/application/stats_providers.dart';
 import '../../progression/domain/stats.dart';
 
 class ProgressPage extends ConsumerWidget {
@@ -16,8 +15,6 @@ class ProgressPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final prog = ref.watch(progressionStateProvider);
     final history = ref.watch(historyProvider);
-    final questsDone = ref.watch(questsDoneProvider);
-    final weekActiveRate = ref.watch(weekActiveRateProvider);
     final now = DateTime.now();
 
     // Compute real stats from history
@@ -178,12 +175,11 @@ class ProgressPage extends ConsumerWidget {
 
   int _catPct(Map<dynamic, int> xpByCategory, String category, int totalXp) {
     if (totalXp == 0) return 0;
-    final catXp = xpByCategory.values.elementAt(
-      xpByCategory.keys.toList().indexWhere(
-        (k) => k.name == category,
-        orElse: () => null,
-      ),
+    final key = xpByCategory.keys.firstWhere(
+      (k) => k.name == category,
+      orElse: () => xpByCategory.keys.first,
     );
+    final catXp = xpByCategory[key] ?? 0;
     return totalXp > 0 ? ((catXp / totalXp) * 100).round() : 0;
   }
 }
