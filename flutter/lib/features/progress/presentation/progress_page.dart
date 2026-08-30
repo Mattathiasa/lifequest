@@ -174,13 +174,16 @@ class ProgressPage extends ConsumerWidget {
   }
 
   int _catPct(Map<dynamic, int> xpByCategory, String category, int totalXp) {
-    if (totalXp == 0) return 0;
-    final key = xpByCategory.keys.firstWhere(
-      (k) => k.name == category,
-      orElse: () => xpByCategory.keys.first,
-    );
-    final catXp = xpByCategory[key] ?? 0;
-    return totalXp > 0 ? ((catXp / totalXp) * 100).round() : 0;
+    if (totalXp == 0 || xpByCategory.isEmpty) return 0;
+    try {
+      final key = xpByCategory.keys.firstWhere(
+        (k) => k.name == category,
+      );
+      final catXp = xpByCategory[key] ?? 0;
+      return totalXp > 0 ? ((catXp / totalXp) * 100).round() : 0;
+    } catch (_) {
+      return 0;
+    }
   }
 }
 
