@@ -75,6 +75,10 @@ class _OnboardingFlowState extends ConsumerState<OnboardingFlow> {
           difficulty: _difficulty,
           name: _nameController.text,
         );
+    // Save the selected focus goals
+    await ref
+        .read(settingsProvider.notifier)
+        .setFocusGoals(_goals.toList());
     // The app shell takes over once `onboarded` flips; no navigation needed.
   }
 

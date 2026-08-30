@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../progression/domain/xp_rules.dart';
+import '../../quests/domain/quest.dart';
 
 /// Theme mode options.
 enum AppThemeMode {
@@ -31,6 +32,7 @@ class AppSettings {
     this.reminderHour = 20,
     this.reminderMinute = 0,
     this.themeMode = AppThemeMode.dark,
+    this.focusGoals = const [],
   });
 
   final bool onboarded;
@@ -40,6 +42,7 @@ class AppSettings {
   final int reminderHour;
   final int reminderMinute;
   final AppThemeMode themeMode;
+  final List<QuestCategory> focusGoals;
 
   /// One- or two-letter avatar initials derived from [displayName].
   String get initials {
@@ -71,6 +74,7 @@ class AppSettings {
     int? reminderHour,
     int? reminderMinute,
     AppThemeMode? themeMode,
+    List<QuestCategory>? focusGoals,
   }) {
     return AppSettings(
       onboarded: onboarded ?? this.onboarded,
@@ -80,6 +84,7 @@ class AppSettings {
       reminderHour: reminderHour ?? this.reminderHour,
       reminderMinute: reminderMinute ?? this.reminderMinute,
       themeMode: themeMode ?? this.themeMode,
+      focusGoals: focusGoals ?? this.focusGoals,
     );
   }
 }

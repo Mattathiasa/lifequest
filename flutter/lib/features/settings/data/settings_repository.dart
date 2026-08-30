@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../progression/domain/xp_rules.dart';
+import '../../quests/domain/quest.dart';
 import '../domain/app_settings.dart';
 
 /// Persistence boundary for [AppSettings]. Firebase can implement this later
@@ -19,6 +22,7 @@ class PrefsSettingsRepository implements SettingsRepository {
   static const _kReminderHour = 'reminderHour';
   static const _kReminderMinute = 'reminderMinute';
   static const _kThemeMode = 'themeMode';
+  static const _kFocusGoals = 'focusGoals';
 
   @override
   Future<AppSettings> load() async {
@@ -26,6 +30,22 @@ class PrefsSettingsRepository implements SettingsRepository {
     final modeName =
         prefs.getString(_kDifficulty) ?? DifficultyMode.balanced.name;
     final themeModeName = prefs.getString(_kThemeMode) ?? AppThemeMode.dark.name;
+    
+    // Load focus goals
+    final goalsJson = prefs.getString(_kFocusGoals);
+    List<QuestCategory> focusGoals = [];
+    if (goalsJson != null) {
+      try {
+        final goalsList = jsonDecode(goalsJson) as List;
+        focusGoals = goalsList.map((g) => QuestCategory.values.firstWhere(
+          (c) => c.name == g,
+          orElse: () => QuestCategory.productivity,
+        )).toList();
+      } catch (_) {
+        focusGoals = [];
+      }
+    }
+    
     return AppSettings(
       onboarded: prefs.getBool(_kOnboarded) ?? false,
       difficultyMode: DifficultyMode.values.firstWhere(
@@ -40,6 +60,7 @@ class PrefsSettingsRepository implements SettingsRepository {
         (m) => m.name == themeModeName,
         orElse: () => AppThemeMode.dark,
       ),
+      focusGoals: focusGoals,
     );
   }
 
@@ -53,5 +74,9 @@ class PrefsSettingsRepository implements SettingsRepository {
     await prefs.setInt(_kReminderHour, settings.reminderHour);
     await prefs.setInt(_kReminderMinute, settings.reminderMinute);
     await prefs.setString(_kThemeMode, settings.themeMode.name);
+    
+    // Save focus goals
+    final goalsJson = jsonEncode(settings.focusGoals.map((g) => g.name).toList());
+    await prefs.setString(_kFocusGoals, goalsJson);
   }
 }

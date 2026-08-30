@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../progression/domain/xp_rules.dart';
+import '../../quests/domain/quest.dart';
 import '../data/settings_repository.dart';
 import '../domain/app_settings.dart';
 
@@ -64,6 +65,11 @@ class SettingsController extends AsyncNotifier<AppSettings> {
   Future<void> setThemeMode(AppThemeMode mode) async {
     await _update(_current.copyWith(themeMode: mode));
   }
+
+  /// Set the focus goals selected during onboarding.
+  Future<void> setFocusGoals(List<QuestCategory> goals) async {
+    await _update(_current.copyWith(focusGoals: goals));
+  }
 }
 
 final settingsProvider = AsyncNotifierProvider<SettingsController, AppSettings>(
@@ -90,4 +96,9 @@ final initialsProvider = Provider<String>((ref) {
 /// The current theme mode.
 final themeModeProvider = Provider<AppThemeMode>((ref) {
   return ref.watch(settingsProvider).valueOrNull?.themeMode ?? AppThemeMode.dark;
+});
+
+/// The user's focus goals selected during onboarding.
+final focusGoalsProvider = Provider<List<QuestCategory>>((ref) {
+  return ref.watch(settingsProvider).valueOrNull?.focusGoals ?? [];
 });
