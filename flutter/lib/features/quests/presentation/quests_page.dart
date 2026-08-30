@@ -50,9 +50,12 @@ class _QuestsPageState extends ConsumerState<QuestsPage> {
   @override
   Widget build(BuildContext context) {
     final quests = ref.watch(questListProvider);
+    final questNotifier = ref.watch(questListProvider.notifier);
     final mode = ref.watch(difficultyModeProvider);
     final tabIndex = ref.watch(boardTabProvider);
     final activeCount = quests.where((q) => !q.done).length;
+    final isLoading = questNotifier.isLoading;
+    final error = questNotifier.error;
 
     // Filter quests
     final tab = _tabs[tabIndex];
@@ -185,8 +188,47 @@ class _QuestsPageState extends ConsumerState<QuestsPage> {
 
                   const SizedBox(height: Gap.md),
 
+                  // Loading state
+                  if (isLoading)
+                    const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(32),
+                        child: CircularProgressIndicator(
+                          color: AppColors.accent,
+                          strokeWidth: 2,
+                        ),
+                      ),
+                    )
+
+                  // Error state
+                  else if (error != null)
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppColors.error.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(Radii.card),
+                        border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.error_outline,
+                            color: AppColors.error,
+                            size: 20,
+                          ),
+                          const SizedBox(width: Gap.md),
+                          Expanded(
+                            child: Text(
+                              error,
+                              style: AppType.body.copyWith(color: AppColors.error),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+
                   // Quest list or empty state
-                  if (filtered.isEmpty)
+                  else if (filtered.isEmpty)
                     EmptyState(
                       actionLabel: 'Create quest',
                       onAction: () => _openCreateSheet(context),

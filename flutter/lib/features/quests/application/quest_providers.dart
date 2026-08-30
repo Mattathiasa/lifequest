@@ -10,14 +10,33 @@ final questRepositoryProvider = Provider<QuestRepository>(
   (_) => PrefsQuestRepository(),
 );
 
-/// State holder for the list of quests.
+/// State holder for the list of quests with loading and error states.
 class QuestListNotifier extends Notifier<List<Quest>> {
+  bool _isLoading = false;
+  String? _error;
+
+  bool get isLoading => _isLoading;
+  String? get error => _error;
+
   @override
   List<Quest> build() => [];
 
   Future<void> load() async {
-    final repo = ref.read(questRepositoryProvider);
-    state = await repo.getAll();
+    _isLoading = true;
+    _error = null;
+    // Trigger rebuild to show loading state
+    state = List.from(state);
+
+    try {
+      final repo = ref.read(questRepositoryProvider);
+      state = await repo.getAll();
+    } catch (e) {
+      _error = 'Failed to load quests. Pull to refresh.';
+    } finally {
+      _isLoading = false;
+      // Trigger rebuild to hide loading state
+      state = List.from(state);
+    }
   }
 
   Future<void> complete(int questId) async {

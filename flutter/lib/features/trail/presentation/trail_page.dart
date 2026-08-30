@@ -40,6 +40,8 @@ class _TrailPageState extends ConsumerState<TrailPage> {
   @override
   Widget build(BuildContext context) {
     final quests = ref.watch(questListProvider);
+    final questNotifier = ref.watch(questListProvider.notifier);
+    final isLoading = questNotifier.isLoading;
     final prog = ref.watch(progressionStateProvider);
     final mode = ref.watch(difficultyModeProvider);
     final displayName = ref.watch(displayNameProvider);
@@ -191,8 +193,20 @@ class _TrailPageState extends ConsumerState<TrailPage> {
 
                   const SizedBox(height: Gap.md),
 
+                  // ── Loading state ──
+                  if (isLoading)
+                    const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(32),
+                        child: CircularProgressIndicator(
+                          color: AppColors.accent,
+                          strokeWidth: 2,
+                        ),
+                      ),
+                    )
+
                   // ── The trail ──
-                  ...List.generate(todayQuests.length, (i) {
+                  else ...List.generate(todayQuests.length, (i) {
                     final q = todayQuests[i];
                     final state = q.done
                         ? 'cleared'
