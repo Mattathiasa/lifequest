@@ -9,13 +9,14 @@ import '../../../core/widgets/xp_tick_bar.dart';
 import '../../../core/widgets/category_chip.dart';
 import '../../progression/application/achievement_providers.dart';
 import '../../progression/application/progression_controller.dart';
+import '../../progression/application/skill_providers.dart';
 import '../../settings/application/settings_controller.dart';
 
 /// Skill tree node data from the prototype.
 class SkillNode {
   const SkillNode({
     required this.name,
-    required this.state,
+    required this.defaultState,
     required this.requirement,
     required this.description,
     required this.benefit,
@@ -23,7 +24,7 @@ class SkillNode {
   });
 
   final String name;
-  final String state; // Mastered, Unlocked, Available, Locked
+  final String defaultState; // Default state if not dynamically determined
   final String requirement;
   final String description;
   final String benefit;
@@ -35,7 +36,7 @@ const _skillTree = <String, List<SkillNode>>{
   'Health': [
     SkillNode(
       name: 'Beginner',
-      state: 'Mastered',
+      defaultState: 'Mastered',
       requirement: '5 quests',
       description: 'You showed up. The first week is the hard one.',
       benefit: '+1 HEALTH per quest',
@@ -43,7 +44,7 @@ const _skillTree = <String, List<SkillNode>>{
     ),
     SkillNode(
       name: 'Consistent',
-      state: 'Unlocked',
+      defaultState: 'Unlocked',
       requirement: '25 quests',
       description: 'Health quests four days a week, for a month.',
       benefit: '+2 HEALTH per quest',
@@ -51,7 +52,7 @@ const _skillTree = <String, List<SkillNode>>{
     ),
     SkillNode(
       name: 'Athlete',
-      state: 'Available',
+      defaultState: 'Available',
       requirement: '60 quests',
       description: 'Sustain hard training quests for eight weeks.',
       benefit: 'Unlocks epic training chains',
@@ -59,7 +60,7 @@ const _skillTree = <String, List<SkillNode>>{
     ),
     SkillNode(
       name: 'Elite',
-      state: 'Locked',
+      defaultState: 'Locked',
       requirement: '150 quests',
       description: 'Needs Athlete plus a 100-day streak.',
       benefit: '+5 HEALTH · Elite title',
@@ -69,7 +70,7 @@ const _skillTree = <String, List<SkillNode>>{
   'Knowledge': [
     SkillNode(
       name: 'Curious',
-      state: 'Mastered',
+      defaultState: 'Mastered',
       requirement: '5 quests',
       description: 'First study sessions logged.',
       benefit: '+1 INTELLECT',
@@ -77,7 +78,7 @@ const _skillTree = <String, List<SkillNode>>{
     ),
     SkillNode(
       name: 'Student',
-      state: 'Unlocked',
+      defaultState: 'Unlocked',
       requirement: '30 quests',
       description: 'A month of daily learning.',
       benefit: '+2 INTELLECT',
@@ -85,7 +86,7 @@ const _skillTree = <String, List<SkillNode>>{
     ),
     SkillNode(
       name: 'Practitioner',
-      state: 'Available',
+      defaultState: 'Available',
       requirement: '80 quests',
       description: 'Ship something you learned — projects count double.',
       benefit: 'Unlocks project chains',
@@ -93,7 +94,7 @@ const _skillTree = <String, List<SkillNode>>{
     ),
     SkillNode(
       name: 'Expert',
-      state: 'Locked',
+      defaultState: 'Locked',
       requirement: '200 quests',
       description: 'Teach the thing you learned.',
       benefit: '+5 INTELLECT · Scholar',
@@ -103,7 +104,7 @@ const _skillTree = <String, List<SkillNode>>{
   'Career': [
     SkillNode(
       name: 'Focused',
-      state: 'Unlocked',
+      defaultState: 'Unlocked',
       requirement: '10 quests',
       description: 'Deep-work blocks five days running.',
       benefit: '+1 FOCUS',
@@ -111,7 +112,7 @@ const _skillTree = <String, List<SkillNode>>{
     ),
     SkillNode(
       name: 'Operator',
-      state: 'Available',
+      defaultState: 'Available',
       requirement: '40 quests',
       description: 'Plan the week before it starts, four weeks straight.',
       benefit: 'Weekly planning slot',
@@ -119,7 +120,7 @@ const _skillTree = <String, List<SkillNode>>{
     ),
     SkillNode(
       name: 'Lead',
-      state: 'Locked',
+      defaultState: 'Locked',
       requirement: '100 quests',
       description: 'Mentoring and delegation quests unlock here.',
       benefit: '+3 SOCIAL · +3 FOCUS',
@@ -127,7 +128,7 @@ const _skillTree = <String, List<SkillNode>>{
     ),
     SkillNode(
       name: 'Founder',
-      state: 'Locked',
+      defaultState: 'Locked',
       requirement: '250 quests',
       description: 'The long game.',
       benefit: 'Legendary title',
@@ -137,7 +138,7 @@ const _skillTree = <String, List<SkillNode>>{
   'Finance': [
     SkillNode(
       name: 'Tracker',
-      state: 'Unlocked',
+      defaultState: 'Unlocked',
       requirement: '8 quests',
       description: 'Log spending for two weeks.',
       benefit: '+1 DISCIPLINE',
@@ -145,7 +146,7 @@ const _skillTree = <String, List<SkillNode>>{
     ),
     SkillNode(
       name: 'Saver',
-      state: 'Available',
+      defaultState: 'Available',
       requirement: '30 quests',
       description: 'Hit a monthly savings target three times.',
       benefit: 'Unlocks goal vault',
@@ -153,7 +154,7 @@ const _skillTree = <String, List<SkillNode>>{
     ),
     SkillNode(
       name: 'Investor',
-      state: 'Locked',
+      defaultState: 'Locked',
       requirement: '75 quests',
       description: 'Automate, then review quarterly.',
       benefit: '+3 DISCIPLINE',
@@ -161,7 +162,7 @@ const _skillTree = <String, List<SkillNode>>{
     ),
     SkillNode(
       name: 'Free',
-      state: 'Locked',
+      defaultState: 'Locked',
       requirement: '200 quests',
       description: 'Runway measured in years.',
       benefit: 'Legendary title',
@@ -171,7 +172,7 @@ const _skillTree = <String, List<SkillNode>>{
   'Bonds': [
     SkillNode(
       name: 'Present',
-      state: 'Unlocked',
+      defaultState: 'Unlocked',
       requirement: '6 quests',
       description: 'Phone away, people first.',
       benefit: '+1 SOCIAL',
@@ -179,7 +180,7 @@ const _skillTree = <String, List<SkillNode>>{
     ),
     SkillNode(
       name: 'Connector',
-      state: 'Available',
+      defaultState: 'Available',
       requirement: '25 quests',
       description: 'Reach out weekly for two months.',
       benefit: 'Unlocks shared quests',
@@ -187,7 +188,7 @@ const _skillTree = <String, List<SkillNode>>{
     ),
     SkillNode(
       name: 'Anchor',
-      state: 'Locked',
+      defaultState: 'Locked',
       requirement: '70 quests',
       description: 'Be the person others rely on.',
       benefit: '+3 SOCIAL',
@@ -195,7 +196,7 @@ const _skillTree = <String, List<SkillNode>>{
     ),
     SkillNode(
       name: 'Community',
-      state: 'Locked',
+      defaultState: 'Locked',
       requirement: '160 quests',
       description: 'Build something with other people.',
       benefit: 'Legendary title',
@@ -205,7 +206,7 @@ const _skillTree = <String, List<SkillNode>>{
   'Craft': [
     SkillNode(
       name: 'Maker',
-      state: 'Unlocked',
+      defaultState: 'Unlocked',
       requirement: '6 quests',
       description: 'Finish small things, often.',
       benefit: '+1 CREATIVITY',
@@ -213,7 +214,7 @@ const _skillTree = <String, List<SkillNode>>{
     ),
     SkillNode(
       name: 'Craftsman',
-      state: 'Available',
+      defaultState: 'Available',
       requirement: '28 quests',
       description: 'A daily practice, thirty days.',
       benefit: 'Unlocks portfolio quests',
@@ -221,7 +222,7 @@ const _skillTree = <String, List<SkillNode>>{
     ),
     SkillNode(
       name: 'Author',
-      state: 'Locked',
+      defaultState: 'Locked',
       requirement: '80 quests',
       description: 'Publish the work.',
       benefit: '+3 CREATIVITY',
@@ -229,7 +230,7 @@ const _skillTree = <String, List<SkillNode>>{
     ),
     SkillNode(
       name: 'Visionary',
-      state: 'Locked',
+      defaultState: 'Locked',
       requirement: '180 quests',
       description: 'A body of work.',
       benefit: 'Legendary title',
@@ -239,7 +240,7 @@ const _skillTree = <String, List<SkillNode>>{
   'Mind': [
     SkillNode(
       name: 'Still',
-      state: 'Mastered',
+      defaultState: 'Mastered',
       requirement: '7 quests',
       description: 'A week of sitting with your own head.',
       benefit: '+1 DISCIPLINE',
@@ -247,7 +248,7 @@ const _skillTree = <String, List<SkillNode>>{
     ),
     SkillNode(
       name: 'Grounded',
-      state: 'Unlocked',
+      defaultState: 'Unlocked',
       requirement: '30 quests',
       description: 'Daily meditation for a month.',
       benefit: '+2 DISCIPLINE',
@@ -255,7 +256,7 @@ const _skillTree = <String, List<SkillNode>>{
     ),
     SkillNode(
       name: 'Centered',
-      state: 'Available',
+      defaultState: 'Available',
       requirement: '75 quests',
       description: 'Longer sits plus one full detox day.',
       benefit: 'Unlocks retreat adventure',
@@ -263,7 +264,7 @@ const _skillTree = <String, List<SkillNode>>{
     ),
     SkillNode(
       name: 'Serene',
-      state: 'Locked',
+      defaultState: 'Locked',
       requirement: '180 quests',
       description: 'Equanimity under real pressure.',
       benefit: '+5 DISCIPLINE',
@@ -308,9 +309,13 @@ class _CharacterPageState extends ConsumerState<CharacterPage> {
     final prog = ref.watch(progressionStateProvider);
     final initials = ref.watch(initialsProvider);
     final achievements = ref.watch(achievementsProvider);
+    final nodeStates = ref.watch(skillNodeStatesProvider(_skillBranch));
     final nodes = _skillTree[_skillBranch] ?? [];
     final selectedNode = _selectedNode < nodes.length
         ? nodes[_selectedNode]
+        : null;
+    final selectedNodeState = _selectedNode < nodeStates.length
+        ? nodeStates[_selectedNode]
         : null;
 
     return Container(
@@ -419,8 +424,9 @@ class _CharacterPageState extends ConsumerState<CharacterPage> {
                   Row(
                     children: List.generate(nodes.length, (i) {
                       final node = nodes[i];
+                      final nodeState = i < nodeStates.length ? nodeStates[i] : node.defaultState;
                       final isSelected = i == _selectedNode;
-                      final stateColor = _nodeStateColor(node.state);
+                      final stateColor = _nodeStateColor(nodeState);
 
                       return Expanded(
                         child: GestureDetector(
@@ -465,7 +471,7 @@ class _CharacterPageState extends ConsumerState<CharacterPage> {
                                 Text(
                                   node.name,
                                   style: AppType.bodySmall.copyWith(
-                                    color: node.state == 'Locked'
+                                    color: nodeState == 'Locked'
                                         ? AppColors.muted
                                         : AppColors.textPrimary,
                                     fontSize: 11,
@@ -477,7 +483,7 @@ class _CharacterPageState extends ConsumerState<CharacterPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  node.state.toUpperCase(),
+                                  nodeState.toUpperCase(),
                                   style: AppType.microLabel,
                                   textAlign: TextAlign.center,
                                 ),
@@ -490,9 +496,9 @@ class _CharacterPageState extends ConsumerState<CharacterPage> {
                   ),
 
                   // Node detail panel
-                  if (selectedNode != null) ...[
+                  if (selectedNode != null && selectedNodeState != null) ...[
                     const SizedBox(height: Gap.md),
-                    _NodeDetailPanel(node: selectedNode),
+                    _NodeDetailPanel(node: selectedNode, state: selectedNodeState),
                   ],
 
                   const SizedBox(height: Gap.xl),
@@ -627,9 +633,10 @@ class _AttributeRow extends StatelessWidget {
 }
 
 class _NodeDetailPanel extends StatelessWidget {
-  const _NodeDetailPanel({required this.node});
+  const _NodeDetailPanel({required this.node, required this.state});
 
   final SkillNode node;
+  final String state;
 
   @override
   Widget build(BuildContext context) {
@@ -647,7 +654,7 @@ class _NodeDetailPanel extends StatelessWidget {
             children: [
               Text(node.name, style: AppType.cardTitle),
               const SizedBox(width: Gap.sm),
-              Text(node.state.toUpperCase(), style: AppType.eyebrow),
+              Text(state.toUpperCase(), style: AppType.eyebrow),
             ],
           ),
           const SizedBox(height: Gap.sm),
