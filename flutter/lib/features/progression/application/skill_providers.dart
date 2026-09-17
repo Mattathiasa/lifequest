@@ -19,46 +19,158 @@ class SkillNodeRequirement {
 /// The unlock requirements for each skill branch's nodes.
 const skillNodeRequirements = <String, List<SkillNodeRequirement>>{
   'Health': [
-    SkillNodeRequirement(attribute: Attribute.health, minValue: 0, minQuestsInCategory: 0),
-    SkillNodeRequirement(attribute: Attribute.health, minValue: 30, minQuestsInCategory: 25),
-    SkillNodeRequirement(attribute: Attribute.health, minValue: 50, minQuestsInCategory: 60),
-    SkillNodeRequirement(attribute: Attribute.health, minValue: 75, minQuestsInCategory: 150),
+    SkillNodeRequirement(
+      attribute: Attribute.health,
+      minValue: 0,
+      minQuestsInCategory: 0,
+    ),
+    SkillNodeRequirement(
+      attribute: Attribute.health,
+      minValue: 30,
+      minQuestsInCategory: 25,
+    ),
+    SkillNodeRequirement(
+      attribute: Attribute.health,
+      minValue: 50,
+      minQuestsInCategory: 60,
+    ),
+    SkillNodeRequirement(
+      attribute: Attribute.health,
+      minValue: 75,
+      minQuestsInCategory: 150,
+    ),
   ],
   'Knowledge': [
-    SkillNodeRequirement(attribute: Attribute.intellect, minValue: 0, minQuestsInCategory: 0),
-    SkillNodeRequirement(attribute: Attribute.intellect, minValue: 35, minQuestsInCategory: 30),
-    SkillNodeRequirement(attribute: Attribute.intellect, minValue: 55, minQuestsInCategory: 80),
-    SkillNodeRequirement(attribute: Attribute.intellect, minValue: 80, minQuestsInCategory: 200),
+    SkillNodeRequirement(
+      attribute: Attribute.intellect,
+      minValue: 0,
+      minQuestsInCategory: 0,
+    ),
+    SkillNodeRequirement(
+      attribute: Attribute.intellect,
+      minValue: 35,
+      minQuestsInCategory: 30,
+    ),
+    SkillNodeRequirement(
+      attribute: Attribute.intellect,
+      minValue: 55,
+      minQuestsInCategory: 80,
+    ),
+    SkillNodeRequirement(
+      attribute: Attribute.intellect,
+      minValue: 80,
+      minQuestsInCategory: 200,
+    ),
   ],
   'Career': [
-    SkillNodeRequirement(attribute: Attribute.focus, minValue: 0, minQuestsInCategory: 0),
-    SkillNodeRequirement(attribute: Attribute.focus, minValue: 30, minQuestsInCategory: 40),
-    SkillNodeRequirement(attribute: Attribute.focus, minValue: 55, minQuestsInCategory: 100),
-    SkillNodeRequirement(attribute: Attribute.focus, minValue: 80, minQuestsInCategory: 250),
+    SkillNodeRequirement(
+      attribute: Attribute.focus,
+      minValue: 0,
+      minQuestsInCategory: 0,
+    ),
+    SkillNodeRequirement(
+      attribute: Attribute.focus,
+      minValue: 30,
+      minQuestsInCategory: 40,
+    ),
+    SkillNodeRequirement(
+      attribute: Attribute.focus,
+      minValue: 55,
+      minQuestsInCategory: 100,
+    ),
+    SkillNodeRequirement(
+      attribute: Attribute.focus,
+      minValue: 80,
+      minQuestsInCategory: 250,
+    ),
   ],
   'Finance': [
-    SkillNodeRequirement(attribute: Attribute.discipline, minValue: 0, minQuestsInCategory: 0),
-    SkillNodeRequirement(attribute: Attribute.discipline, minValue: 25, minQuestsInCategory: 30),
-    SkillNodeRequirement(attribute: Attribute.discipline, minValue: 50, minQuestsInCategory: 75),
-    SkillNodeRequirement(attribute: Attribute.discipline, minValue: 80, minQuestsInCategory: 200),
+    SkillNodeRequirement(
+      attribute: Attribute.discipline,
+      minValue: 0,
+      minQuestsInCategory: 0,
+    ),
+    SkillNodeRequirement(
+      attribute: Attribute.discipline,
+      minValue: 25,
+      minQuestsInCategory: 30,
+    ),
+    SkillNodeRequirement(
+      attribute: Attribute.discipline,
+      minValue: 50,
+      minQuestsInCategory: 75,
+    ),
+    SkillNodeRequirement(
+      attribute: Attribute.discipline,
+      minValue: 80,
+      minQuestsInCategory: 200,
+    ),
   ],
   'Bonds': [
-    SkillNodeRequirement(attribute: Attribute.social, minValue: 0, minQuestsInCategory: 0),
-    SkillNodeRequirement(attribute: Attribute.social, minValue: 25, minQuestsInCategory: 25),
-    SkillNodeRequirement(attribute: Attribute.social, minValue: 50, minQuestsInCategory: 70),
-    SkillNodeRequirement(attribute: Attribute.social, minValue: 75, minQuestsInCategory: 160),
+    SkillNodeRequirement(
+      attribute: Attribute.social,
+      minValue: 0,
+      minQuestsInCategory: 0,
+    ),
+    SkillNodeRequirement(
+      attribute: Attribute.social,
+      minValue: 25,
+      minQuestsInCategory: 25,
+    ),
+    SkillNodeRequirement(
+      attribute: Attribute.social,
+      minValue: 50,
+      minQuestsInCategory: 70,
+    ),
+    SkillNodeRequirement(
+      attribute: Attribute.social,
+      minValue: 75,
+      minQuestsInCategory: 160,
+    ),
   ],
   'Craft': [
-    SkillNodeRequirement(attribute: Attribute.creativity, minValue: 0, minQuestsInCategory: 0),
-    SkillNodeRequirement(attribute: Attribute.creativity, minValue: 25, minQuestsInCategory: 28),
-    SkillNodeRequirement(attribute: Attribute.creativity, minValue: 50, minQuestsInCategory: 80),
-    SkillNodeRequirement(attribute: Attribute.creativity, minValue: 75, minQuestsInCategory: 180),
+    SkillNodeRequirement(
+      attribute: Attribute.creativity,
+      minValue: 0,
+      minQuestsInCategory: 0,
+    ),
+    SkillNodeRequirement(
+      attribute: Attribute.creativity,
+      minValue: 25,
+      minQuestsInCategory: 28,
+    ),
+    SkillNodeRequirement(
+      attribute: Attribute.creativity,
+      minValue: 50,
+      minQuestsInCategory: 80,
+    ),
+    SkillNodeRequirement(
+      attribute: Attribute.creativity,
+      minValue: 75,
+      minQuestsInCategory: 180,
+    ),
   ],
   'Mind': [
-    SkillNodeRequirement(attribute: Attribute.discipline, minValue: 0, minQuestsInCategory: 0),
-    SkillNodeRequirement(attribute: Attribute.discipline, minValue: 30, minQuestsInCategory: 30),
-    SkillNodeRequirement(attribute: Attribute.discipline, minValue: 55, minQuestsInCategory: 75),
-    SkillNodeRequirement(attribute: Attribute.discipline, minValue: 80, minQuestsInCategory: 180),
+    SkillNodeRequirement(
+      attribute: Attribute.discipline,
+      minValue: 0,
+      minQuestsInCategory: 0,
+    ),
+    SkillNodeRequirement(
+      attribute: Attribute.discipline,
+      minValue: 30,
+      minQuestsInCategory: 30,
+    ),
+    SkillNodeRequirement(
+      attribute: Attribute.discipline,
+      minValue: 55,
+      minQuestsInCategory: 75,
+    ),
+    SkillNodeRequirement(
+      attribute: Attribute.discipline,
+      minValue: 80,
+      minQuestsInCategory: 180,
+    ),
   ],
 };
 
@@ -83,7 +195,8 @@ String determineNodeState({
 }) {
   // First node is always available (or mastered if prerequisites met)
   if (previousNodeIndex < 0) {
-    if (attributeValue >= requirement.minValue && questsInCategory >= requirement.minQuestsInCategory) {
+    if (attributeValue >= requirement.minValue &&
+        questsInCategory >= requirement.minQuestsInCategory) {
       return 'Mastered';
     }
     return 'Unlocked';
@@ -122,7 +235,10 @@ String determineNodeState({
 }
 
 /// Provider for skill node states for a given branch.
-final skillNodeStatesProvider = Provider.family<List<String>, String>((ref, branch) {
+final skillNodeStatesProvider = Provider.family<List<String>, String>((
+  ref,
+  branch,
+) {
   final attributes = ref.watch(attributesProvider);
   final history = ref.watch(historyProvider);
 
@@ -131,9 +247,9 @@ final skillNodeStatesProvider = Provider.family<List<String>, String>((ref, bran
 
   // Count quests in this branch's category
   final categoryName = branchCategoryMap[branch];
-  final questsInCategory = history.where(
-    (e) => e.category.name == categoryName,
-  ).length;
+  final questsInCategory = history
+      .where((e) => e.category.name == categoryName)
+      .length;
 
   for (var i = 0; i < requirements.length; i++) {
     final req = requirements[i];

@@ -22,17 +22,19 @@ void main() {
       final quests = await repository.getAll();
 
       expect(
-        () => quests.add(const Quest(
-          id: 99,
-          code: 'TST',
-          name: 'Test',
-          desc: 'Test quest',
-          category: QuestCategory.health,
-          difficulty: QuestDifficulty.easy,
-          time: '10 min',
-          due: 'Today',
-          schedule: QuestSchedule.today,
-        )),
+        () => quests.add(
+          const Quest(
+            id: 99,
+            code: 'TST',
+            name: 'Test',
+            desc: 'Test quest',
+            category: QuestCategory.health,
+            difficulty: QuestDifficulty.easy,
+            time: '10 min',
+            due: 'Today',
+            schedule: QuestSchedule.today,
+          ),
+        ),
         throwsUnsupportedError,
       );
     });

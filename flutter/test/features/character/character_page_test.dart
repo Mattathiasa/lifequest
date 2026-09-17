@@ -14,10 +14,7 @@ void main() {
     testWidgets('renders without crashing', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
-          child: MaterialApp(
-            theme: AppTheme.dark,
-            home: const CharacterPage(),
-          ),
+          child: MaterialApp(theme: AppTheme.dark, home: const CharacterPage()),
         ),
       );
       await tester.pumpAndSettle();
@@ -28,10 +25,7 @@ void main() {
     testWidgets('displays character identity section', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
-          child: MaterialApp(
-            theme: AppTheme.dark,
-            home: const CharacterPage(),
-          ),
+          child: MaterialApp(theme: AppTheme.dark, home: const CharacterPage()),
         ),
       );
       await tester.pumpAndSettle();
@@ -43,10 +37,7 @@ void main() {
     testWidgets('displays attributes section', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
-          child: MaterialApp(
-            theme: AppTheme.dark,
-            home: const CharacterPage(),
-          ),
+          child: MaterialApp(theme: AppTheme.dark, home: const CharacterPage()),
         ),
       );
       await tester.pumpAndSettle();
@@ -60,10 +51,7 @@ void main() {
     testWidgets('displays level and XP information', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
-          child: MaterialApp(
-            theme: AppTheme.dark,
-            home: const CharacterPage(),
-          ),
+          child: MaterialApp(theme: AppTheme.dark, home: const CharacterPage()),
         ),
       );
       await tester.pumpAndSettle();

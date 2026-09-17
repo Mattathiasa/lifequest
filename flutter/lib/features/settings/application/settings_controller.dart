@@ -5,7 +5,6 @@ import '../../quests/domain/quest.dart';
 import '../data/settings_repository.dart';
 import '../domain/app_settings.dart';
 
-
 final settingsRepositoryProvider = Provider<SettingsRepository>(
   (_) => PrefsSettingsRepository(),
 );
@@ -58,7 +57,9 @@ class SettingsController extends AsyncNotifier<AppSettings> {
 
   /// Set the reminder time.
   Future<void> setReminderTime(int hour, int minute) async {
-    await _update(_current.copyWith(reminderHour: hour, reminderMinute: minute));
+    await _update(
+      _current.copyWith(reminderHour: hour, reminderMinute: minute),
+    );
   }
 
   /// Set the theme mode.
@@ -95,7 +96,8 @@ final initialsProvider = Provider<String>((ref) {
 
 /// The current theme mode.
 final themeModeProvider = Provider<AppThemeMode>((ref) {
-  return ref.watch(settingsProvider).valueOrNull?.themeMode ?? AppThemeMode.dark;
+  return ref.watch(settingsProvider).valueOrNull?.themeMode ??
+      AppThemeMode.dark;
 });
 
 /// The user's focus goals selected during onboarding.

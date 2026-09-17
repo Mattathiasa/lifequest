@@ -107,162 +107,164 @@ class _TrailPageState extends ConsumerState<TrailPage> {
           color: AppColors.accent,
           backgroundColor: AppColors.surface,
           child: CustomScrollView(
-          slivers: [
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: Gap.gutter,
-              ).copyWith(bottom: 26),
-              sliver: SliverList.list(
-                children: [
-                  const SizedBox(height: Gap.md),
+            slivers: [
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: Gap.gutter,
+                ).copyWith(bottom: 26),
+                sliver: SliverList.list(
+                  children: [
+                    const SizedBox(height: Gap.md),
 
-                  // ── Greeting row ──
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(dateLine, style: AppType.metaLabel),
-                            const SizedBox(height: 2),
-                            Text(
-                              '$greeting, $firstName',
-                              style: AppType.screenTitle,
-                            ),
-                            const SizedBox(height: 2),
-                            Text(nextUp, style: AppType.body),
-                          ],
-                        ),
-                      ),
-                      // Avatar tile
-                      Container(
-                        width: 42,
-                        height: 42,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF131A24),
-                          borderRadius: BorderRadius.circular(Radii.iconTile),
-                          border: Border.all(color: AppColors.borderStrong),
-                        ),
-                        child: Text(
-                          initials,
-                          style: AppType.value.copyWith(
-                            color: AppColors.accent,
-                            fontSize: 13,
+                    // ── Greeting row ──
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(dateLine, style: AppType.metaLabel),
+                              const SizedBox(height: 2),
+                              Text(
+                                '$greeting, $firstName',
+                                style: AppType.screenTitle,
+                              ),
+                              const SizedBox(height: 2),
+                              Text(nextUp, style: AppType.body),
+                            ],
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: Gap.xl),
-
-                  // ── Hero level card ──
-                  _HeroLevelCard(
-                    level: prog.level,
-                    xp: prog.xpIntoLevel,
-                    need: need,
-                    filledTicks: filledTicks,
-                    xpToNext: xpToNext,
-                    streak: prog.streak,
-                    todayPct: pct,
-                    weekPct: weekPct,
-                  ),
-
-                  const SizedBox(height: Gap.xl),
-
-                  // ── Section head ──
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Flexible(
-                        child: Text(
-                          "Today's trail",
-                          style: AppType.sectionTitle,
-                          overflow: TextOverflow.ellipsis,
+                        // Avatar tile
+                        Container(
+                          width: 42,
+                          height: 42,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF131A24),
+                            borderRadius: BorderRadius.circular(Radii.iconTile),
+                            border: Border.all(color: AppColors.borderStrong),
+                          ),
+                          child: Text(
+                            initials,
+                            style: AppType.value.copyWith(
+                              color: AppColors.accent,
+                              fontSize: 13,
+                            ),
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: Gap.sm),
-                      Text(
-                        '$clearedCount of $totalCount cleared',
-                        style: AppType.metaLabel,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: Gap.md),
-
-                  // ── Loading state ──
-                  if (isLoading)
-                    const Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(32),
-                        child: CircularProgressIndicator(
-                          color: AppColors.accent,
-                          strokeWidth: 2,
-                        ),
-                      ),
-                    )
-
-                  // ── The trail ──
-                  else ...List.generate(todayQuests.length, (i) {
-                    final q = todayQuests[i];
-                    final state = q.done
-                        ? 'cleared'
-                        : (q == liveQuest ? 'live' : 'ahead');
-                    final label = (i + 1).toString().padLeft(2, '0');
-
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: Gap.md),
-                      child: _TrailRow(
-                        nodeLabel: label,
-                        nodeState: state,
-                        quest: q,
-                        mode: mode,
-                        isFirst: i == 0,
-                        isLast: i == todayQuests.length - 1,
-                        trailPct: trailPct,
-                        index: i,
-                        total: todayQuests.length,
-                        onStartFocus: q == liveQuest
-                            ? () => _openFocusSheet(q)
-                            : null,
-                        onDone: q == liveQuest ? () => _completeQuest(q) : null,
-                        onTap: () => _openFocusSheet(q),
-                      ),
-                    );
-                  }),
-
-                  // ── Reward node ──
-                  _RewardNode(
-                    allCleared: totalCount > 0 && clearedCount == totalCount,
-                    claimed: claimedToday,
-                    streak: prog.streak,
-                    remaining: totalCount - clearedCount,
-                    onClaim:
-                        totalCount > 0 &&
-                            clearedCount == totalCount &&
-                            !claimedToday
-                        ? _claimDayBonus
-                        : null,
-                  ),
-
-                  const SizedBox(height: Gap.lg),
-
-                  // ── Side quest card ──
-                  if (_showDailyChallenge)
-                    _SideQuestCard(
-                      accepted: _sideQuestAccepted,
-                      onAccept: () => _acceptSideQuest(),
+                      ],
                     ),
 
-                  const SizedBox(height: 100), // bottom nav clearance
-                ],
+                    const SizedBox(height: Gap.xl),
+
+                    // ── Hero level card ──
+                    _HeroLevelCard(
+                      level: prog.level,
+                      xp: prog.xpIntoLevel,
+                      need: need,
+                      filledTicks: filledTicks,
+                      xpToNext: xpToNext,
+                      streak: prog.streak,
+                      todayPct: pct,
+                      weekPct: weekPct,
+                    ),
+
+                    const SizedBox(height: Gap.xl),
+
+                    // ── Section head ──
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            "Today's trail",
+                            style: AppType.sectionTitle,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: Gap.sm),
+                        Text(
+                          '$clearedCount of $totalCount cleared',
+                          style: AppType.metaLabel,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: Gap.md),
+
+                    // ── Loading state ──
+                    if (isLoading)
+                      const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(32),
+                          child: CircularProgressIndicator(
+                            color: AppColors.accent,
+                            strokeWidth: 2,
+                          ),
+                        ),
+                      )
+                    // ── The trail ──
+                    else
+                      ...List.generate(todayQuests.length, (i) {
+                        final q = todayQuests[i];
+                        final state = q.done
+                            ? 'cleared'
+                            : (q == liveQuest ? 'live' : 'ahead');
+                        final label = (i + 1).toString().padLeft(2, '0');
+
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: Gap.md),
+                          child: _TrailRow(
+                            nodeLabel: label,
+                            nodeState: state,
+                            quest: q,
+                            mode: mode,
+                            isFirst: i == 0,
+                            isLast: i == todayQuests.length - 1,
+                            trailPct: trailPct,
+                            index: i,
+                            total: todayQuests.length,
+                            onStartFocus: q == liveQuest
+                                ? () => _openFocusSheet(q)
+                                : null,
+                            onDone: q == liveQuest
+                                ? () => _completeQuest(q)
+                                : null,
+                            onTap: () => _openFocusSheet(q),
+                          ),
+                        );
+                      }),
+
+                    // ── Reward node ──
+                    _RewardNode(
+                      allCleared: totalCount > 0 && clearedCount == totalCount,
+                      claimed: claimedToday,
+                      streak: prog.streak,
+                      remaining: totalCount - clearedCount,
+                      onClaim:
+                          totalCount > 0 &&
+                              clearedCount == totalCount &&
+                              !claimedToday
+                          ? _claimDayBonus
+                          : null,
+                    ),
+
+                    const SizedBox(height: Gap.lg),
+
+                    // ── Side quest card ──
+                    if (_showDailyChallenge)
+                      _SideQuestCard(
+                        accepted: _sideQuestAccepted,
+                        onAccept: () => _acceptSideQuest(),
+                      ),
+
+                    const SizedBox(height: 100), // bottom nav clearance
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
+            ],
+          ),
         ),
       ),
     );

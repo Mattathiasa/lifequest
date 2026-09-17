@@ -14,10 +14,7 @@ void main() {
     testWidgets('renders without crashing', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
-          child: MaterialApp(
-            theme: AppTheme.dark,
-            home: const ProfilePage(),
-          ),
+          child: MaterialApp(theme: AppTheme.dark, home: const ProfilePage()),
         ),
       );
       await tester.pumpAndSettle();
@@ -28,10 +25,7 @@ void main() {
     testWidgets('displays "Profile" header', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
-          child: MaterialApp(
-            theme: AppTheme.dark,
-            home: const ProfilePage(),
-          ),
+          child: MaterialApp(theme: AppTheme.dark, home: const ProfilePage()),
         ),
       );
       await tester.pumpAndSettle();
@@ -42,10 +36,7 @@ void main() {
     testWidgets('displays lifetime XP stat', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
-          child: MaterialApp(
-            theme: AppTheme.dark,
-            home: const ProfilePage(),
-          ),
+          child: MaterialApp(theme: AppTheme.dark, home: const ProfilePage()),
         ),
       );
       await tester.pumpAndSettle();
@@ -57,10 +48,7 @@ void main() {
     testWidgets('displays settings rows', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
-          child: MaterialApp(
-            theme: AppTheme.dark,
-            home: const ProfilePage(),
-          ),
+          child: MaterialApp(theme: AppTheme.dark, home: const ProfilePage()),
         ),
       );
       await tester.pumpAndSettle();
@@ -76,10 +64,7 @@ void main() {
     testWidgets('displays streak freeze section', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
-          child: MaterialApp(
-            theme: AppTheme.dark,
-            home: const ProfilePage(),
-          ),
+          child: MaterialApp(theme: AppTheme.dark, home: const ProfilePage()),
         ),
       );
       await tester.pumpAndSettle();

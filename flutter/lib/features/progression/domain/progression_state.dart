@@ -39,7 +39,9 @@ class ProgressionState {
     if (lastStreakFreezeUsed == null) return true;
     final now = DateTime.now();
     final lastUsed = lastStreakFreezeUsed!;
-    return !(lastUsed.year == now.year && lastUsed.month == now.month && lastUsed.day == now.day);
+    return !(lastUsed.year == now.year &&
+        lastUsed.month == now.month &&
+        lastUsed.day == now.day);
   }
 
   ProgressionState copyWith({

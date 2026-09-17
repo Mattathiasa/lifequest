@@ -424,7 +424,9 @@ class _CharacterPageState extends ConsumerState<CharacterPage> {
                   Row(
                     children: List.generate(nodes.length, (i) {
                       final node = nodes[i];
-                      final nodeState = i < nodeStates.length ? nodeStates[i] : node.defaultState;
+                      final nodeState = i < nodeStates.length
+                          ? nodeStates[i]
+                          : node.defaultState;
                       final isSelected = i == _selectedNode;
                       final stateColor = _nodeStateColor(nodeState);
 
@@ -498,7 +500,10 @@ class _CharacterPageState extends ConsumerState<CharacterPage> {
                   // Node detail panel
                   if (selectedNode != null && selectedNodeState != null) ...[
                     const SizedBox(height: Gap.md),
-                    _NodeDetailPanel(node: selectedNode, state: selectedNodeState),
+                    _NodeDetailPanel(
+                      node: selectedNode,
+                      state: selectedNodeState,
+                    ),
                   ],
 
                   const SizedBox(height: Gap.xl),

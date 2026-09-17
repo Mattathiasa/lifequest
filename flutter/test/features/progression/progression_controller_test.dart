@@ -35,19 +35,20 @@ void main() {
       expect(updated.streakFreezes, 2);
     });
 
-    test('canUseStreakFreeze returns true when freezes > 0 and not used today', () {
-      const state = ProgressionState(
-        streakFreezes: 1,
-        lastStreakFreezeUsed: null,
-      );
+    test(
+      'canUseStreakFreeze returns true when freezes > 0 and not used today',
+      () {
+        const state = ProgressionState(
+          streakFreezes: 1,
+          lastStreakFreezeUsed: null,
+        );
 
-      expect(state.canUseStreakFreeze, true);
-    });
+        expect(state.canUseStreakFreeze, true);
+      },
+    );
 
     test('canUseStreakFreeze returns false when freezes = 0', () {
-      const state = ProgressionState(
-        streakFreezes: 0,
-      );
+      const state = ProgressionState(streakFreezes: 0);
 
       expect(state.canUseStreakFreeze, false);
     });

@@ -68,7 +68,8 @@ class _QuestsPageState extends ConsumerState<QuestsPage> {
         _ => true,
       };
       final catMatch = _category == 'All' || q.category.label == _category;
-      final searchMatch = _searchQuery.isEmpty ||
+      final searchMatch =
+          _searchQuery.isEmpty ||
           q.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
           q.desc.toLowerCase().contains(_searchQuery.toLowerCase());
       return scheduleMatch && catMatch && searchMatch;
@@ -83,173 +84,190 @@ class _QuestsPageState extends ConsumerState<QuestsPage> {
           color: AppColors.accent,
           backgroundColor: AppColors.surface,
           child: CustomScrollView(
-          slivers: [
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: Gap.gutter),
-              sliver: SliverList.list(
-                children: [
-                  const SizedBox(height: Gap.md),
+            slivers: [
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: Gap.gutter),
+                sliver: SliverList.list(
+                  children: [
+                    const SizedBox(height: Gap.md),
 
-                  // Header row
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text('Quest board', style: AppType.screenTitle),
-                      ),
-                      Text(
-                        '$activeCount ACTIVE · ${_category.toUpperCase()}',
-                        style: AppType.metaLabel,
-                      ),
-                      const SizedBox(width: Gap.md),
-                      GestureDetector(
-                        onTap: () => _openCreateSheet(context),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
+                    // Header row
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'Quest board',
+                            style: AppType.screenTitle,
                           ),
-                          decoration: BoxDecoration(
-                            color: AppColors.accent,
-                            borderRadius: BorderRadius.circular(Radii.iconTile),
-                          ),
-                          child: Text('New', style: AppType.buttonPrimary),
                         ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: Gap.lg),
-
-                  // Segment tabs
-                  SegmentTabs(
-                    tabs: _tabs,
-                    activeIndex: tabIndex,
-                    onTap: (i) => ref.read(boardTabProvider.notifier).state = i,
-                  ),
-
-                  const SizedBox(height: Gap.md),
-
-                  // Category chips (horizontal scroll)
-                  SizedBox(
-                    height: 36,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: _categories.length,
-                      separatorBuilder: (_, s) => const SizedBox(width: Gap.xs),
-                      itemBuilder: (_, i) {
-                        final cat = _categories[i];
-                        return CategoryChip(
-                          label: cat,
-                          selected: _category == cat,
-                          onTap: () => setState(() => _category = cat),
-                        );
-                      },
-                    ),
-                  ),
-
-                  const SizedBox(height: Gap.lg),
-
-                  // Search bar
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14),
-                    decoration: BoxDecoration(
-                      color: AppColors.surface,
-                      borderRadius: BorderRadius.circular(Radii.input),
-                      border: Border.all(color: AppColors.borderStrong),
-                    ),
-                    child: TextField(
-                      controller: _searchController,
-                      style: AppType.body.copyWith(color: AppColors.textPrimary),
-                      decoration: InputDecoration(
-                        hintText: 'Search quests...',
-                        border: InputBorder.none,
-                        prefixIcon: const Icon(
-                          Icons.search,
-                          color: AppColors.muted,
-                          size: 20,
+                        Text(
+                          '$activeCount ACTIVE · ${_category.toUpperCase()}',
+                          style: AppType.metaLabel,
                         ),
-                        suffixIcon: _searchQuery.isNotEmpty
-                            ? GestureDetector(
-                                onTap: () {
-                                  _searchController.clear();
-                                  setState(() => _searchQuery = '');
-                                },
-                                child: const Icon(
-                                  Icons.clear,
-                                  color: AppColors.muted,
-                                  size: 20,
-                                ),
-                              )
-                            : null,
-                      ),
-                      onChanged: (value) => setState(() => _searchQuery = value),
-                    ),
-                  ),
-
-                  const SizedBox(height: Gap.md),
-
-                  // Loading state
-                  if (isLoading)
-                    const Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(32),
-                        child: CircularProgressIndicator(
-                          color: AppColors.accent,
-                          strokeWidth: 2,
-                        ),
-                      ),
-                    )
-
-                  // Error state
-                  else if (error != null)
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: AppColors.error.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(Radii.card),
-                        border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.error_outline,
-                            color: AppColors.error,
-                            size: 20,
-                          ),
-                          const SizedBox(width: Gap.md),
-                          Expanded(
-                            child: Text(
-                              error,
-                              style: AppType.body.copyWith(color: AppColors.error),
+                        const SizedBox(width: Gap.md),
+                        GestureDetector(
+                          onTap: () => _openCreateSheet(context),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
                             ),
+                            decoration: BoxDecoration(
+                              color: AppColors.accent,
+                              borderRadius: BorderRadius.circular(
+                                Radii.iconTile,
+                              ),
+                            ),
+                            child: Text('New', style: AppType.buttonPrimary),
                           ),
-                        ],
-                      ),
-                    )
+                        ),
+                      ],
+                    ),
 
-                  // Quest list or empty state
-                  else if (filtered.isEmpty)
-                    EmptyState(
-                      actionLabel: 'Create quest',
-                      onAction: () => _openCreateSheet(context),
-                    )
-                  else
-                    ...filtered.map(
-                      (q) => _BoardQuestCard(
-                        quest: q,
-                        mode: mode,
-                        onTap: () => _openQuest(q),
-                        onEdit: () => _openEditSheet(q),
-                        onDelete: () => _confirmDelete(q),
+                    const SizedBox(height: Gap.lg),
+
+                    // Segment tabs
+                    SegmentTabs(
+                      tabs: _tabs,
+                      activeIndex: tabIndex,
+                      onTap: (i) =>
+                          ref.read(boardTabProvider.notifier).state = i,
+                    ),
+
+                    const SizedBox(height: Gap.md),
+
+                    // Category chips (horizontal scroll)
+                    SizedBox(
+                      height: 36,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: _categories.length,
+                        separatorBuilder: (_, s) =>
+                            const SizedBox(width: Gap.xs),
+                        itemBuilder: (_, i) {
+                          final cat = _categories[i];
+                          return CategoryChip(
+                            label: cat,
+                            selected: _category == cat,
+                            onTap: () => setState(() => _category = cat),
+                          );
+                        },
                       ),
                     ),
 
-                  const SizedBox(height: 100), // bottom nav clearance
-                ],
+                    const SizedBox(height: Gap.lg),
+
+                    // Search bar
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
+                      decoration: BoxDecoration(
+                        color: AppColors.surface,
+                        borderRadius: BorderRadius.circular(Radii.input),
+                        border: Border.all(color: AppColors.borderStrong),
+                      ),
+                      // TextField requires a Material ancestor; the page renders
+                      // standalone (tests, embeds) outside the app Scaffold.
+                      child: Material(
+                        type: MaterialType.transparency,
+                        child: TextField(
+                          controller: _searchController,
+                          style: AppType.body.copyWith(
+                            color: AppColors.textPrimary,
+                          ),
+                          decoration: InputDecoration(
+                            hintText: 'Search quests...',
+                            border: InputBorder.none,
+                            prefixIcon: const Icon(
+                              Icons.search,
+                              color: AppColors.muted,
+                              size: 20,
+                            ),
+                            suffixIcon: _searchQuery.isNotEmpty
+                                ? GestureDetector(
+                                    onTap: () {
+                                      _searchController.clear();
+                                      setState(() => _searchQuery = '');
+                                    },
+                                    child: const Icon(
+                                      Icons.clear,
+                                      color: AppColors.muted,
+                                      size: 20,
+                                    ),
+                                  )
+                                : null,
+                          ),
+                          onChanged: (value) =>
+                              setState(() => _searchQuery = value),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: Gap.md),
+
+                    // Loading state
+                    if (isLoading)
+                      const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(32),
+                          child: CircularProgressIndicator(
+                            color: AppColors.accent,
+                            strokeWidth: 2,
+                          ),
+                        ),
+                      )
+                    // Error state
+                    else if (error != null)
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: AppColors.error.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(Radii.card),
+                          border: Border.all(
+                            color: AppColors.error.withValues(alpha: 0.3),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.error_outline,
+                              color: AppColors.error,
+                              size: 20,
+                            ),
+                            const SizedBox(width: Gap.md),
+                            Expanded(
+                              child: Text(
+                                error,
+                                style: AppType.body.copyWith(
+                                  color: AppColors.error,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    // Quest list or empty state
+                    else if (filtered.isEmpty)
+                      EmptyState(
+                        actionLabel: 'Create quest',
+                        onAction: () => _openCreateSheet(context),
+                      )
+                    else
+                      ...filtered.map(
+                        (q) => _BoardQuestCard(
+                          quest: q,
+                          mode: mode,
+                          onTap: () => _openQuest(q),
+                          onEdit: () => _openEditSheet(q),
+                          onDelete: () => _confirmDelete(q),
+                        ),
+                      ),
+
+                    const SizedBox(height: 100), // bottom nav clearance
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
+            ],
+          ),
         ),
       ),
     );

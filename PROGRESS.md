@@ -2,8 +2,90 @@
 
 ## Session Summary
 
-**Date:** August 30, 2026  
-**Status:** MVP Development Phase Complete ✅
+**Date:** September 17, 2026  
+**Status:** MVP + Online Layer Complete ✅
+
+---
+
+## Added This Session: The Online Layer Is Now Usable
+
+The sync engine was complete but passive — it only connected when a human pressed
+Connect, anonymous workspaces died with the device, and repositories registered
+after connect never saw cloud data. All three closed:
+
+### 1. Auto-reconnect on launch
+`SyncController.build` now replays the saved "connected" state for real: it
+reconnects, pulls both stores, and flushes the offline queue on every app
+start. Failures keep the saved preference and surface in the sheet (next
+launch retries). No more staring at "Linking…" forever.
+
+### 2. Email OTP sign-in / device linking (no console setup)
+Anonymous accounts are device-bound; the sheet promised cross-device carry but
+couldn't deliver. Now it can, using only the Appwrite SDK's email-token flow:
+
+- `CloudGateway.sendSignInCode` / `signInWithCode` on the interface;
+- Appwrite impl: `createEmailToken` + `createSession`, with a stable per-email
+  OTP user id (persisted) and a derived dummy password — the account is
+  email-code-only, nobody ever types a password;
+- controller methods `sendSignInCode`, `signInWithCode` (pull remote stores,
+  push local stores, remember the email), `rememberAccountEmail`;
+- the sync sheet gained a **CARRY YOUR ADVENTURE** section: email → emailed
+  code → verify & link → "SIGNED IN" row. Works on a fresh device too (no
+  Connect needed first).
+
+### 3. Late store registration pulls immediately
+`registerStore` now: replays the cached remote snapshot if one was already
+pulled, or fires a fresh pull when the controller is already connected/syncing.
+Lazy provider creation no longer misses the connect-time pull.
+
+### Tests
++8 sync tests (auto-reconnect ×2, OTP happy path + remote pull + send/code
+failures ×4, late registration, account-email lifecycle). **133 total, all
+green; `flutter analyze` clean.**
+
+---
+
+## Going live (cloud data) — 5-minute setup
+
+1. Create a free project at [cloud.appwrite.io](https://cloud.appwrite.io).
+2. Add an **Android**/**iOS** platform (package id `com.mattathias.lifequest`).
+3. In **Databases** create database `lifequest` and a collection `game_state`
+   with **no attributes** and these permissions (role `any`):
+   `documents.read`, `documents.create`, `documents.update`.
+4. In the app: **Profile → Cloud sync → Connect** (endpoint and ids are
+   prefilled; only the project id must be pasted).
+5. Optionally **CARRY YOUR ADVENTURE → email a code** to link the device to a
+   portable account. Every later device: connect to the same project, email a
+   code, sign in — the trail comes along.
+
+No API keys ship in the client; the app talks to Appwrite directly with the
+project id only.
+
+---
+
+## Added This Session: Online & Manageable
+
+### Cloud Sync (`lib/features/sync/`)
+| Piece | What it does |
+|-------|--------------|
+| `CloudGateway` | Backend-agnostic interface (connect/fetch/put/disconnect) |
+| `AppwriteCloudGateway` | Appwrite Cloud DocumentsDB implementation — anonymous auth, one JSON doc per store per player |
+| `FakeCloudGateway` | In-memory gateway for tests |
+| `SyncController` | Offline-first engine: queue → collapse → flush → retry; pull-on-connect; persisted status |
+| `SyncedQuestRepository` / `SyncedProgressionRepository` | Wrap local stores; every write mirrors to the cloud, remote snapshots merge with last-write-wins |
+| Cloud sync settings sheet | Connect / status / sync-now / disconnect in Profile |
+
+**Data model:** `lifequest` database, `game_state` collection (schemaless), documents
+`<playerId>-quests` and `<playerId>-game_state`. Only the session lives on device;
+cloud data survives disconnects.
+
+### AI Quest Generation (`lib/features/quests/application/quest_generator.dart`)
+- `QuestGenerator` interface with two implementations:
+  - `RemoteQuestGenerator` — any OpenAI-compatible endpoint (OpenAI, OpenRouter, Groq, …);
+    strict JSON reply, markdown-fence tolerant, bad replies fall back automatically.
+  - `LocalQuestGenerator` — deterministic themed quest packs, always available.
+- Config (API key, base URL, model) persisted from the create sheet flow; no key = local mode.
+- The create sheet is now async with loading and error states.
 
 ---
 
@@ -173,16 +255,17 @@
 
 ## Next Steps for Production
 
-### Phase 1: Firebase Integration
-- [ ] Firebase Auth (Google, Apple sign-in)
-- [ ] Firestore for cloud data sync
+### Phase 1: Cloud Setup (partially done)
+- [x] Cloud sync engine + gateway interface
+- [x] Appwrite Cloud implementation (needs a project created by the user to go live)
+- [x] Real-email sign-in upgrade (email-OTP account linking, no console setup)
+- [x] Auto-reconnect on launch + late store registration pull
 - [ ] Firebase Cloud Messaging for push notifications
-- [ ] Firebase Analytics
-- [ ] Firebase Crashlytics
+- [ ] Firebase Analytics + Crashlytics
 
-### Phase 2: AI Integration
-- [ ] OpenAI/Claude API for quest generation
-- [ ] Personalized recommendations
+### Phase 2: AI (partially done)
+- [x] Quest generation with remote provider + local fallback
+- [ ] Personalized recommendations (coach card from real aggregates)
 - [ ] Smart difficulty adjustment
 
 ### Phase 3: Monetization

@@ -11,6 +11,8 @@ import '../../progression/application/progression_controller.dart';
 import '../../progression/domain/xp_rules.dart';
 import '../../settings/application/settings_controller.dart';
 import '../../settings/domain/app_settings.dart';
+import '../../sync/application/sync_controller.dart';
+import '../../sync/presentation/cloud_sync_sheet.dart';
 
 class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
@@ -101,7 +103,9 @@ class ProfilePage extends ConsumerWidget {
                     freezes: prog.streakFreezes,
                     canUse: prog.canUseStreakFreeze,
                     streak: prog.streak,
-                    onUseFreeze: () => ref.read(progressionProvider.notifier).useStreakFreeze(),
+                    onUseFreeze: () => ref
+                        .read(progressionProvider.notifier)
+                        .useStreakFreeze(),
                     onBuyFreeze: () => _showBuyFreezeSheet(context, ref),
                   ),
 
@@ -139,6 +143,13 @@ class ProfilePage extends ConsumerWidget {
                           icon: Icons.lock_outline,
                           name: 'Privacy',
                           hint: 'Data & security',
+                        ),
+                        _SettingsRow(
+                          icon: Icons.cloud_sync_outlined,
+                          name: 'Cloud sync',
+                          hint: ref.watch(cloudSyncHintProvider),
+                          accent: ref.watch(cloudSyncAccentProvider),
+                          onTap: () => showCloudSyncSheet(context),
                         ),
                         _SettingsRow(
                           icon: Icons.replay,
@@ -247,7 +258,10 @@ class _StreakFreezeCard extends StatelessWidget {
               Text('Streak Freezes', style: AppType.cardTitle),
               const Spacer(),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.accentSurface,
                   borderRadius: BorderRadius.circular(Radii.iconTile),
@@ -274,7 +288,9 @@ class _StreakFreezeCard extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: canUse ? AppColors.accent : AppColors.trackInactive,
+                      color: canUse
+                          ? AppColors.accent
+                          : AppColors.trackInactive,
                       borderRadius: BorderRadius.circular(Radii.button),
                     ),
                     child: Text(
@@ -316,6 +332,7 @@ class _SettingsRow extends StatelessWidget {
     required this.hint,
     this.onTap,
     this.showDivider = true,
+    this.accent = false,
   });
 
   final IconData icon;
@@ -323,6 +340,10 @@ class _SettingsRow extends StatelessWidget {
   final String hint;
   final VoidCallback? onTap;
   final bool showDivider;
+
+  /// Tints the icon with the accent — used when the row carries live state
+  /// (e.g. cloud sync connected).
+  final bool accent;
 
   @override
   Widget build(BuildContext context) {
@@ -337,7 +358,11 @@ class _SettingsRow extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 18),
               child: Row(
                 children: [
-                  Icon(icon, size: 20, color: AppColors.slate),
+                  Icon(
+                    icon,
+                    size: 20,
+                    color: accent ? AppColors.accent : AppColors.slate,
+                  ),
                   const SizedBox(width: Gap.md),
                   Expanded(
                     child: Column(
@@ -513,7 +538,7 @@ void _showBuyFreezeSheet(BuildContext context, WidgetRef ref) {
 
 void _showThemePicker(BuildContext context, WidgetRef ref) {
   final currentMode = ref.read(themeModeProvider);
-  
+
   showGlassSheet(
     context,
     builder: (_) => GlassSheet(
@@ -545,9 +570,11 @@ void _showThemePicker(BuildContext context, WidgetRef ref) {
                 child: Row(
                   children: [
                     Icon(
-                      mode == AppThemeMode.dark ? Icons.dark_mode_outlined :
-                      mode == AppThemeMode.light ? Icons.light_mode_outlined :
-                      Icons.phone_android_outlined,
+                      mode == AppThemeMode.dark
+                          ? Icons.dark_mode_outlined
+                          : mode == AppThemeMode.light
+                          ? Icons.light_mode_outlined
+                          : Icons.phone_android_outlined,
                       size: 20,
                       color: selected ? AppColors.accent : AppColors.slate,
                     ),
@@ -556,12 +583,18 @@ void _showThemePicker(BuildContext context, WidgetRef ref) {
                       child: Text(
                         mode.label,
                         style: AppType.cardTitle.copyWith(
-                          color: selected ? AppColors.accent : AppColors.textPrimary,
+                          color: selected
+                              ? AppColors.accent
+                              : AppColors.textPrimary,
                         ),
                       ),
                     ),
                     if (selected)
-                      const Icon(Icons.check, size: 20, color: AppColors.accent),
+                      const Icon(
+                        Icons.check,
+                        size: 20,
+                        color: AppColors.accent,
+                      ),
                   ],
                 ),
               ),
@@ -575,8 +608,9 @@ void _showThemePicker(BuildContext context, WidgetRef ref) {
 }
 
 void _showNotificationSettings(BuildContext context, WidgetRef ref) {
-  final settings = ref.read(settingsProvider).valueOrNull ?? const AppSettings();
-  
+  final settings =
+      ref.read(settingsProvider).valueOrNull ?? const AppSettings();
+
   showGlassSheet(
     context,
     builder: (_) => _NotificationSettingsSheet(settings: settings),
@@ -589,10 +623,12 @@ class _NotificationSettingsSheet extends ConsumerStatefulWidget {
   final AppSettings settings;
 
   @override
-  ConsumerState<_NotificationSettingsSheet> createState() => _NotificationSettingsSheetState();
+  ConsumerState<_NotificationSettingsSheet> createState() =>
+      _NotificationSettingsSheetState();
 }
 
-class _NotificationSettingsSheetState extends ConsumerState<_NotificationSettingsSheet> {
+class _NotificationSettingsSheetState
+    extends ConsumerState<_NotificationSettingsSheet> {
   late bool _notificationsEnabled;
   late int _reminderHour;
   late int _reminderMinute;
@@ -660,11 +696,17 @@ class _NotificationSettingsSheetState extends ConsumerState<_NotificationSetting
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.access_time, size: 20, color: AppColors.slate),
+                    const Icon(
+                      Icons.access_time,
+                      size: 20,
+                      color: AppColors.slate,
+                    ),
                     const SizedBox(width: Gap.md),
                     Text(
                       '${_reminderHour.toString().padLeft(2, '0')}:${_reminderMinute.toString().padLeft(2, '0')}',
-                      style: AppType.body.copyWith(color: AppColors.textPrimary),
+                      style: AppType.body.copyWith(
+                        color: AppColors.textPrimary,
+                      ),
                     ),
                     const Spacer(),
                     Icon(Icons.chevron_right, size: 20, color: AppColors.muted),
@@ -730,7 +772,11 @@ class _NotificationSettingsSheetState extends ConsumerState<_NotificationSetting
   }
 
   void _updateNotificationSettings() {
-    ref.read(settingsProvider.notifier).toggleNotifications(_notificationsEnabled);
-    ref.read(settingsProvider.notifier).setReminderTime(_reminderHour, _reminderMinute);
+    ref
+        .read(settingsProvider.notifier)
+        .toggleNotifications(_notificationsEnabled);
+    ref
+        .read(settingsProvider.notifier)
+        .setReminderTime(_reminderHour, _reminderMinute);
   }
 }

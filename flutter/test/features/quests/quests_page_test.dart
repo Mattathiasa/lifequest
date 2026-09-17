@@ -14,10 +14,7 @@ void main() {
     testWidgets('renders without crashing', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
-          child: MaterialApp(
-            theme: AppTheme.dark,
-            home: const QuestsPage(),
-          ),
+          child: MaterialApp(theme: AppTheme.dark, home: const QuestsPage()),
         ),
       );
       await tester.pumpAndSettle();
@@ -28,10 +25,7 @@ void main() {
     testWidgets('displays "Quest board" header', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
-          child: MaterialApp(
-            theme: AppTheme.dark,
-            home: const QuestsPage(),
-          ),
+          child: MaterialApp(theme: AppTheme.dark, home: const QuestsPage()),
         ),
       );
       await tester.pumpAndSettle();
@@ -42,46 +36,37 @@ void main() {
     testWidgets('displays segment tabs', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
-          child: MaterialApp(
-            theme: AppTheme.dark,
-            home: const QuestsPage(),
-          ),
+          child: MaterialApp(theme: AppTheme.dark, home: const QuestsPage()),
         ),
       );
       await tester.pumpAndSettle();
 
-      // Should find all tab labels
-      expect(find.text('Today'), findsOneWidget);
-      expect(find.text('Upcoming'), findsOneWidget);
-      expect(find.text('Recurring'), findsOneWidget);
-      expect(find.text('Completed'), findsOneWidget);
+      // Tab labels render uppercase (DM Mono, tracked) per the design spec
+      expect(find.text('TODAY'), findsOneWidget);
+      expect(find.text('UPCOMING'), findsOneWidget);
+      expect(find.text('RECURRING'), findsOneWidget);
+      expect(find.text('COMPLETED'), findsOneWidget);
     });
 
     testWidgets('displays category chips', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
-          child: MaterialApp(
-            theme: AppTheme.dark,
-            home: const QuestsPage(),
-          ),
+          child: MaterialApp(theme: AppTheme.dark, home: const QuestsPage()),
         ),
       );
       await tester.pumpAndSettle();
 
-      // Should find category chips
-      expect(find.text('All'), findsOneWidget);
-      expect(find.text('Health'), findsOneWidget);
-      expect(find.text('Learning'), findsOneWidget);
-      expect(find.text('Productivity'), findsOneWidget);
+      // Chip labels render uppercase per the design spec
+      expect(find.text('ALL'), findsOneWidget);
+      expect(find.text('HEALTH'), findsOneWidget);
+      expect(find.text('LEARNING'), findsOneWidget);
+      expect(find.text('PRODUCTIVITY'), findsOneWidget);
     });
 
     testWidgets('displays "New" button', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
-          child: MaterialApp(
-            theme: AppTheme.dark,
-            home: const QuestsPage(),
-          ),
+          child: MaterialApp(theme: AppTheme.dark, home: const QuestsPage()),
         ),
       );
       await tester.pumpAndSettle();
@@ -92,10 +77,7 @@ void main() {
     testWidgets('displays active count', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
-          child: MaterialApp(
-            theme: AppTheme.dark,
-            home: const QuestsPage(),
-          ),
+          child: MaterialApp(theme: AppTheme.dark, home: const QuestsPage()),
         ),
       );
       await tester.pumpAndSettle();

@@ -71,9 +71,7 @@ class PrefsQuestRepository implements QuestRepository {
   Future<void> update(Quest quest) async {
     final prefs = await SharedPreferences.getInstance();
     final quests = await _read(prefs);
-    await _write(prefs, [
-      for (final q in quests) q.id == quest.id ? quest : q,
-    ]);
+    await _write(prefs, [for (final q in quests) q.id == quest.id ? quest : q]);
   }
 
   @override
@@ -81,9 +79,22 @@ class PrefsQuestRepository implements QuestRepository {
     final prefs = await SharedPreferences.getInstance();
     final quests = await _read(prefs);
     await _write(prefs, [
-      for (final q in quests) if (q.id != questId) q,
+      for (final q in quests)
+        if (q.id != questId) q,
     ]);
   }
 
   static String _dayKey(DateTime d) => '${d.year}-${d.month}-${d.day}';
+
+  @override
+  Future<List<Map<String, dynamic>>> exportJson() async {
+    final prefs = await SharedPreferences.getInstance();
+    return [for (final q in await _read(prefs)) q.toJson()];
+  }
+
+  @override
+  Future<void> replaceAllJson(List<Map<String, dynamic>> items) async {
+    final prefs = await SharedPreferences.getInstance();
+    await _write(prefs, [for (final item in items) Quest.fromJson(item)]);
+  }
 }

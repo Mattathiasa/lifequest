@@ -14,10 +14,7 @@ void main() {
     testWidgets('renders without crashing', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
-          child: MaterialApp(
-            theme: AppTheme.dark,
-            home: const ProgressPage(),
-          ),
+          child: MaterialApp(theme: AppTheme.dark, home: const ProgressPage()),
         ),
       );
       await tester.pumpAndSettle();
@@ -28,10 +25,7 @@ void main() {
     testWidgets('displays "Progress" header', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
-          child: MaterialApp(
-            theme: AppTheme.dark,
-            home: const ProgressPage(),
-          ),
+          child: MaterialApp(theme: AppTheme.dark, home: const ProgressPage()),
         ),
       );
       await tester.pumpAndSettle();
@@ -42,10 +36,7 @@ void main() {
     testWidgets('displays streak information', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
-          child: MaterialApp(
-            theme: AppTheme.dark,
-            home: const ProgressPage(),
-          ),
+          child: MaterialApp(theme: AppTheme.dark, home: const ProgressPage()),
         ),
       );
       await tester.pumpAndSettle();
@@ -57,10 +48,7 @@ void main() {
     testWidgets('displays record streak', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
-          child: MaterialApp(
-            theme: AppTheme.dark,
-            home: const ProgressPage(),
-          ),
+          child: MaterialApp(theme: AppTheme.dark, home: const ProgressPage()),
         ),
       );
       await tester.pumpAndSettle();
@@ -72,40 +60,31 @@ void main() {
     testWidgets('displays weekly XP section', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
-          child: MaterialApp(
-            theme: AppTheme.dark,
-            home: const ProgressPage(),
-          ),
+          child: MaterialApp(theme: AppTheme.dark, home: const ProgressPage()),
         ),
       );
       await tester.pumpAndSettle();
 
-      // Should find WEEKLY XP text
-      expect(find.text('WEEKLY XP'), findsOneWidget);
+      // Weekly XP panel headline is the total, e.g. '1,234 TOTAL'
+      expect(find.textContaining('TOTAL'), findsOneWidget);
     });
 
     testWidgets('displays consistency heatmap', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
-          child: MaterialApp(
-            theme: AppTheme.dark,
-            home: const ProgressPage(),
-          ),
+          child: MaterialApp(theme: AppTheme.dark, home: const ProgressPage()),
         ),
       );
       await tester.pumpAndSettle();
 
-      // Should find CONSISTENCY text
-      expect(find.text('CONSISTENCY'), findsOneWidget);
+      // Consistency grid caption per the design spec
+      expect(find.text('LAST 6 WEEKS · LIME = QUESTS CLEARED'), findsOneWidget);
     });
 
     testWidgets('displays XP breakdown section', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
-          child: MaterialApp(
-            theme: AppTheme.dark,
-            home: const ProgressPage(),
-          ),
+          child: MaterialApp(theme: AppTheme.dark, home: const ProgressPage()),
         ),
       );
       await tester.pumpAndSettle();

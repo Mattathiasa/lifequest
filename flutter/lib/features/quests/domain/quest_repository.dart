@@ -2,8 +2,8 @@ import 'quest.dart';
 
 /// Abstract interface for quest data.
 ///
-/// Firebase will implement this; presentation never touches a data source
-/// directly.
+/// Cloud sync implements this around a local store; presentation never
+/// touches a data source directly.
 abstract class QuestRepository {
   /// All quests.
   Future<List<Quest>> getAll();
@@ -19,4 +19,10 @@ abstract class QuestRepository {
 
   /// Delete a quest by id.
   Future<void> delete(int questId);
+
+  /// JSON snapshot of every quest — the cloud-sync payload.
+  Future<List<Map<String, dynamic>>> exportJson();
+
+  /// Replace the whole store from a cloud-sync payload.
+  Future<void> replaceAllJson(List<Map<String, dynamic>> items);
 }

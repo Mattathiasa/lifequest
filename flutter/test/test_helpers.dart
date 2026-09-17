@@ -21,10 +21,7 @@ Widget createTestableApp({
       if (progressionState != null)
         progressionStateProvider.overrideWithValue(progressionState),
     ],
-    child: MaterialApp(
-      theme: AppTheme.dark,
-      home: child,
-    ),
+    child: MaterialApp(theme: AppTheme.dark, home: child),
   );
 }
 

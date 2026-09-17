@@ -5,7 +5,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../quests/application/quest_providers.dart';
 import '../../quests/domain/quest.dart';
 import '../../settings/application/settings_controller.dart';
+import '../../sync/application/sync_controller.dart';
+import '../../sync/domain/sync_models.dart';
 import '../data/progression_repository.dart';
+import '../data/synced_progression_repository.dart';
 import '../domain/attributes.dart';
 import '../domain/completion_event.dart';
 import '../domain/progression_state.dart';
@@ -103,6 +106,16 @@ class ProgressionController extends Notifier<ProgressionFullState> {
     );
   }
 
+  /// Replace state from an external snapshot (cloud pull) without
+  /// re-persisting — the source snapshot is already durable.
+  void replaceSnapshot(GameSnapshot snap) {
+    state = state.copyWith(
+      progression: snap.progression,
+      attributes: snap.attributes,
+      history: snap.history,
+    );
+  }
+
   // ── Public actions ────────────────────────────────────────────────────────
 
   /// Complete a quest: mark done, flash, then award XP + grow attributes + log.
@@ -123,18 +136,18 @@ class ProgressionController extends Notifier<ProgressionFullState> {
     final p = state.progression;
     final now = DateTime.now();
     if (p.lastClearedDay != null && _sameDay(p.lastClearedDay!, now)) return;
-    
+
     // Check if we can continue the streak
     final yesterday = now.subtract(const Duration(days: 1));
     final continues =
         p.lastClearedDay != null &&
         (_sameDay(p.lastClearedDay!, yesterday) ||
-         _sameDay(p.lastClearedDay!, now.subtract(const Duration(days: 2))));
-    
+            _sameDay(p.lastClearedDay!, now.subtract(const Duration(days: 2))));
+
     // If streak would break and we have a freeze, use it
     final streakWouldBreak = !continues && p.streak > 0;
     final useFreeze = streakWouldBreak && p.canUseStreakFreeze;
-    
+
     final streak = (continues || useFreeze) ? p.streak + 1 : 1;
     state = state.copyWith(
       progression: p.copyWith(
@@ -146,7 +159,7 @@ class ProgressionController extends Notifier<ProgressionFullState> {
       ),
     );
     _persist();
-    
+
     if (useFreeze) {
       showFlash(xp: XpRules.dayClearBonus, name: 'Streak freeze used!');
     } else {
@@ -159,7 +172,7 @@ class ProgressionController extends Notifier<ProgressionFullState> {
   void useStreakFreeze() {
     final p = state.progression;
     if (!p.canUseStreakFreeze) return;
-    
+
     final now = DateTime.now();
     state = state.copyWith(
       progression: p.copyWith(
@@ -175,9 +188,7 @@ class ProgressionController extends Notifier<ProgressionFullState> {
   void addStreakFreeze() {
     final p = state.progression;
     state = state.copyWith(
-      progression: p.copyWith(
-        streakFreezes: p.streakFreezes + 1,
-      ),
+      progression: p.copyWith(streakFreezes: p.streakFreezes + 1),
     );
     _persist();
   }
@@ -259,9 +270,20 @@ class ProgressionController extends Notifier<ProgressionFullState> {
       a.year == b.year && a.month == b.month && a.day == b.day;
 }
 
-final progressionRepositoryProvider = Provider<ProgressionRepository>(
-  (_) => PrefsProgressionRepository(),
-);
+final progressionRepositoryProvider = Provider<ProgressionRepository>((ref) {
+  final sync = ref.watch(syncProvider.notifier);
+  final repo = SyncedProgressionRepository(
+    local: PrefsProgressionRepository(),
+    sync: sync,
+  );
+  // Register for pull-on-connect: apply the remote snapshot, then push it
+  // into the live state so open screens reflect the merge immediately.
+  sync.registerStore(gameStateStoreKey, (data) async {
+    await repo.applyRemote(data);
+    ref.read(progressionProvider.notifier).replaceSnapshot(await repo.load());
+  });
+  return repo;
+});
 
 final progressionProvider =
     NotifierProvider<ProgressionController, ProgressionFullState>(

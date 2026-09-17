@@ -6,9 +6,9 @@ import 'core/services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Initialize notification service
   await NotificationService().initialize();
-  
+
   runApp(const ProviderScope(child: LifeQuestApp()));
 }

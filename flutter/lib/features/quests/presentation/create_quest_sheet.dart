@@ -9,19 +9,10 @@ import '../../../core/utils/haptics.dart';
 import '../../../core/widgets/category_chip.dart';
 import '../../../core/widgets/glass_sheet.dart';
 import '../../progression/domain/xp_rules.dart';
+import '../../quests/application/quest_generator.dart';
 import '../../quests/application/quest_providers.dart';
 import '../../quests/domain/quest.dart';
 import '../../settings/application/settings_controller.dart';
-
-/// The (stubbed) AI prompt and the quest chain it "returns". No backend yet —
-/// deterministic sample so the generated-list UI is real and reviewable.
-const _aiPrompt = 'I want to become healthier';
-const _generated = <({String code, String name, QuestDifficulty diff})>[
-  (code: 'HYD', name: 'Drink 2L water', diff: QuestDifficulty.easy),
-  (code: 'MOV', name: '20-minute walk', diff: QuestDifficulty.easy),
-  (code: 'SLP', name: 'Lights out by 11', diff: QuestDifficulty.medium),
-  (code: 'VEG', name: 'One green meal', diff: QuestDifficulty.easy),
-];
 
 /// Opens the create quest sheet.
 void showCreateQuestSheet(BuildContext context, {Quest? quest}) {
@@ -46,7 +37,11 @@ class _CreateQuestSheetContentState
   late final TextEditingController _nameController;
   late QuestCategory _category;
   late QuestDifficulty _difficulty;
-  bool _aiGenerated = false;
+
+  // AI generation state.
+  bool _generating = false;
+  String? _generateError;
+  GenerationResult? _result;
 
   bool get _isEditing => widget.questToEdit != null;
 
@@ -89,14 +84,30 @@ class _CreateQuestSheetContentState
             // AI row — only for create
             if (!_isEditing) ...[
               _AiRow(
-                generated: _aiGenerated,
-                onTryIt: () => setState(() => _aiGenerated = true),
-                onRedo: () => setState(() => _aiGenerated = false),
+                generating: _generating,
+                result: _result,
+                error: _generateError,
+                onTryIt: _generate,
+                onRedo: _generate,
               ),
 
               // Generated quest chain
-              if (_aiGenerated)
-                _GeneratedList(mode: mode, onAddAll: _addAllGenerated),
+              if (_result != null)
+                _GeneratedList(
+                  mode: mode,
+                  quests: _result!.quests,
+                  onAddAll: _addAllGenerated,
+                ),
+
+              if (_generateError != null) ...[
+                const SizedBox(height: Gap.sm),
+                Text(
+                  _generateError!,
+                  style: AppType.bodySmall.copyWith(
+                    color: AppColors.difficultyEpic,
+                  ),
+                ),
+              ],
 
               const SizedBox(height: Gap.lg),
               Divider(color: AppColors.borderHairline),
@@ -268,21 +279,48 @@ class _CreateQuestSheetContentState
     Navigator.of(context).pop();
   }
 
+  /// Runs the quest generator for the current goal. Uses the remote AI
+  /// provider when configured, otherwise the deterministic local pack; both
+  /// paths land here.
+  Future<void> _generate() async {
+    final goal = _nameController.text.trim();
+    setState(() {
+      _generating = true;
+      _generateError = null;
+    });
+    try {
+      final generator = await ref.read(questGeneratorProvider.future);
+      final result = await generator.generate(
+        goal.isEmpty ? 'I want to become healthier' : goal,
+      );
+      if (!mounted) return;
+      setState(() => _result = result);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _generateError = 'Could not generate quests. Try again.');
+    } finally {
+      if (mounted) setState(() => _generating = false);
+    }
+  }
+
   /// Adds the generated chain as recurring quests and lands on Quests →
   /// Recurring, per the spec.
   void _addAllGenerated() {
+    final result = _result;
+    if (result == null) return;
     final notifier = ref.read(questListProvider.notifier);
     final base = DateTime.now().millisecondsSinceEpoch;
-    for (var i = 0; i < _generated.length; i++) {
-      final g = _generated[i];
+    final quests = result.quests;
+    for (var i = 0; i < quests.length; i++) {
+      final g = quests[i];
       notifier.add(
         Quest(
           id: base + i,
           code: g.code,
           name: g.name,
-          desc: 'From your AI goal · $_aiPrompt.',
-          category: QuestCategory.health,
-          difficulty: g.diff,
+          desc: 'From your AI goal · ${result.prompt}.',
+          category: g.category,
+          difficulty: g.difficulty,
           time: '15 min',
           due: 'Daily',
           schedule: QuestSchedule.recurring,
@@ -304,17 +342,22 @@ class _CreateQuestSheetContentState
 
 class _AiRow extends StatelessWidget {
   const _AiRow({
-    required this.generated,
+    required this.generating,
+    required this.result,
+    required this.error,
     required this.onTryIt,
     required this.onRedo,
   });
 
-  final bool generated;
+  final bool generating;
+  final GenerationResult? result;
+  final String? error;
   final VoidCallback onTryIt;
   final VoidCallback onRedo;
 
   @override
   Widget build(BuildContext context) {
+    final hasResult = result != null;
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -333,10 +376,19 @@ class _AiRow extends StatelessWidget {
               shape: BoxShape.circle,
               border: Border.all(color: AppColors.accentBorder),
             ),
-            child: const Text(
-              '✦',
-              style: TextStyle(color: AppColors.accent, fontSize: 14),
-            ),
+            child: generating
+                ? const SizedBox(
+                    width: 14,
+                    height: 14,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: AppColors.accent,
+                    ),
+                  )
+                : const Text(
+                    '✦',
+                    style: TextStyle(color: AppColors.accent, fontSize: 14),
+                  ),
           ),
           const SizedBox(width: Gap.md),
           Expanded(
@@ -344,7 +396,11 @@ class _AiRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  generated ? 'From "$_aiPrompt"' : 'Generate with AI',
+                  switch ((hasResult, generating)) {
+                    (true, _) => 'From "${result!.prompt}"',
+                    (false, true) => 'Designing your chain…',
+                    (false, false) => 'Generate with AI',
+                  },
                   style: AppType.trailTitle.copyWith(
                     color: AppColors.textPrimary,
                   ),
@@ -353,7 +409,7 @@ class _AiRow extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  generated
+                  hasResult
                       ? 'Edit anything before it joins your trail.'
                       : 'Describe a goal, get a quest chain back.',
                   style: AppType.bodySmall,
@@ -361,24 +417,32 @@ class _AiRow extends StatelessWidget {
               ],
             ),
           ),
-          GestureDetector(
-            onTap: generated ? onRedo : onTryIt,
-            child: Text(
-              generated ? 'Redo' : 'Try it',
-              style: AppType.buttonSecondary.copyWith(color: AppColors.accent),
+          if (!generating)
+            GestureDetector(
+              onTap: hasResult ? onRedo : onTryIt,
+              child: Text(
+                hasResult ? 'Redo' : 'Try it',
+                style: AppType.buttonSecondary.copyWith(
+                  color: AppColors.accent,
+                ),
+              ),
             ),
-          ),
         ],
       ),
     );
   }
 }
 
-/// The four AI-generated quests plus the "Add all four" action.
+/// The AI-generated quests plus the "Add all" action.
 class _GeneratedList extends StatelessWidget {
-  const _GeneratedList({required this.mode, required this.onAddAll});
+  const _GeneratedList({
+    required this.mode,
+    required this.quests,
+    required this.onAddAll,
+  });
 
   final DifficultyMode mode;
+  final List<GeneratedQuest> quests;
   final VoidCallback onAddAll;
 
   @override
@@ -387,8 +451,8 @@ class _GeneratedList extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: Gap.md),
-        ..._generated.map((g) {
-          final reward = XpRules.reward(g.diff, mode);
+        ...quests.map((g) {
+          final reward = XpRules.reward(g.difficulty, mode);
           return Container(
             margin: const EdgeInsets.only(bottom: Gap.xs),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -402,7 +466,7 @@ class _GeneratedList extends StatelessWidget {
                 Text(
                   g.code,
                   style: AppType.code.copyWith(
-                    color: AppColors.difficulty[g.diff.index],
+                    color: AppColors.difficulty[g.difficulty.index],
                   ),
                 ),
                 const SizedBox(width: Gap.md),
@@ -435,7 +499,10 @@ class _GeneratedList extends StatelessWidget {
               color: AppColors.accent,
               borderRadius: BorderRadius.circular(Radii.button),
             ),
-            child: Text('Add all four', style: AppType.buttonPrimary),
+            child: Text(
+              quests.length == 4 ? 'Add all four' : 'Add all ${quests.length}',
+              style: AppType.buttonPrimary,
+            ),
           ),
         ),
       ],

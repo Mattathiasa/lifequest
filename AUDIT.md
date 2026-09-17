@@ -1,6 +1,6 @@
 # LifeQuest Project Audit
 
-## Current State: ~75% Complete MVP
+## Current State: MVP Complete + Online Layer
 
 ### What's Built & Working
 
@@ -12,45 +12,29 @@
 | **Trail Screen** | ✅ Complete | Greeting, hero card, trail nodes, reward, side quest |
 | **Quest Board** | ✅ Complete | Filters, empty state, create sheet |
 | **Character Screen** | ✅ Complete | 7 attributes, 7 skill branches, achievements |
-| **Progress Screen** | ✅ Complete | Charts, heatmap, XP breakdown, coach card |
-| **Profile Screen** | ✅ Complete | Settings, difficulty picker |
+| **Progress Screen** | ✅ Complete | Charts, heatmap, XP breakdown, coach card — real aggregates |
+| **Profile Screen** | ✅ Complete | Settings, difficulty picker, cloud sync row |
 | **Focus Timer** | ✅ Complete | Start/pause/resume with tick bar |
 | **XP/Level System** | ✅ Complete | Full award loop, multi-level crossing |
 | **Overlays** | ✅ Complete | Complete flash, level-up animation |
 | **Onboarding** | ✅ Complete | 4-step flow |
 | **Persistence** | ✅ Complete | SharedPreferences with seed data |
-| **Tests** | ⚠️ Partial | 3 test files exist |
+| **Cloud Sync** | ✅ Complete | Appwrite gateway, offline-first queue, LWW merge, settings UI |
+| **AI Quest Generation** | ✅ Complete | OpenAI-compatible remote + deterministic local fallback |
+| **Tests** | ✅ 125 passing | XP rules, sync engine, generator, repositories, screens |
 
 ---
 
 ## Critical Issues to Fix for MVP
 
-### 1. Quest Persistence Bug
-The `quest_providers.dart` creates `PrefsQuestRepository` but it's not actually being used correctly. Need to verify quests persist across app restarts.
+### RESOLVED — see PROGRESS.md for the current state
 
-### 2. Mock Data in Progress Screen
-The Progress page uses hardcoded values:
-- "86% COMPLETION" (not computed)
-- "4,180 TOTAL" (not from history)
-- Weekly XP chart is static mock data
-- Heatmap is hardcoded
-
-**Fix:** Wire up `GameStats` providers to compute real aggregates from completion history.
-
-### 3. No Delete/Edit Quests
-Users can create quests but cannot:
-- Edit quest details
-- Delete quests
-- Mark as reschedule
-
-### 4. No Notifications
-Settings shows "Notifications" but no implementation for:
-- Daily quest reminders
-- Streak warnings
-- Achievement notifications
-
-### 5. No Real AI Integration
-The "Generate with AI" is completely stubbed with hardcoded responses.
+1. ~~Quest persistence~~ — resolved; quests persist locally and sync to the cloud.
+2. ~~Mock Progress data~~ — resolved; all aggregates computed from completion history.
+3. ~~No delete/edit quests~~ — resolved; full CRUD in the quest board.
+4. ~~No notifications~~ — resolved; daily reminder service.
+5. ~~No real AI integration~~ — resolved; pluggable generator with local fallback.
+6. ~~No online data~~ — resolved; cloud sync feature (`lib/features/sync/`).
 
 ---
 

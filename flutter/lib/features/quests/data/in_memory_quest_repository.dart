@@ -165,4 +165,16 @@ class InMemoryQuestRepository implements QuestRepository {
   Future<void> delete(int questId) async {
     _quests.removeWhere((q) => q.id == questId);
   }
+
+  @override
+  Future<List<Map<String, dynamic>>> exportJson() async => [
+    for (final q in _quests) q.toJson(),
+  ];
+
+  @override
+  Future<void> replaceAllJson(List<Map<String, dynamic>> items) async {
+    _quests
+      ..clear()
+      ..addAll([for (final item in items) Quest.fromJson(item)]);
+  }
 }

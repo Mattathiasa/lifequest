@@ -176,9 +176,7 @@ class ProgressPage extends ConsumerWidget {
   int _catPct(Map<dynamic, int> xpByCategory, String category, int totalXp) {
     if (totalXp == 0 || xpByCategory.isEmpty) return 0;
     try {
-      final key = xpByCategory.keys.firstWhere(
-        (k) => k.name == category,
-      );
+      final key = xpByCategory.keys.firstWhere((k) => k.name == category);
       final catXp = xpByCategory[key] ?? 0;
       return totalXp > 0 ? ((catXp / totalXp) * 100).round() : 0;
     } catch (_) {
@@ -248,12 +246,7 @@ class _WeeklyXpChart extends StatelessWidget {
     if (data.isEmpty || data.every((v) => v == 0)) {
       return SizedBox(
         height: 112,
-        child: Center(
-          child: Text(
-            'No XP data yet',
-            style: AppType.body,
-          ),
-        ),
+        child: Center(child: Text('No XP data yet', style: AppType.body)),
       );
     }
 
@@ -333,10 +326,10 @@ class _ConsistencyGrid extends StatelessWidget {
           final intensity = count == 0
               ? 0.0
               : count <= 2
-                  ? 0.15
-                  : count <= 4
-                      ? 0.75
-                      : 1.0;
+              ? 0.15
+              : count <= 4
+              ? 0.75
+              : 1.0;
           rowData.add(intensity);
         } else {
           rowData.add(0.0);
@@ -485,9 +478,7 @@ class _CoachCard extends StatelessWidget {
           const SizedBox(height: Gap.sm),
           Text(
             message,
-            style: AppType.body.copyWith(
-              color: AppColors.textPrimary,
-            ),
+            style: AppType.body.copyWith(color: AppColors.textPrimary),
           ),
         ],
       ),
