@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/utils/haptics.dart';
 import '../../progression/domain/xp_rules.dart';
 import '../../quests/domain/quest.dart';
 import '../data/settings_repository.dart';
@@ -12,11 +13,16 @@ final settingsRepositoryProvider = Provider<SettingsRepository>(
 /// Loads and persists [AppSettings]. The app gates onboarding on this.
 class SettingsController extends AsyncNotifier<AppSettings> {
   @override
-  Future<AppSettings> build() => ref.read(settingsRepositoryProvider).load();
+  Future<AppSettings> build() async {
+    final s = await ref.read(settingsRepositoryProvider).load();
+    AppHaptics.enabled = s.hapticsEnabled;
+    return s;
+  }
 
   AppSettings get _current => state.valueOrNull ?? const AppSettings();
 
   Future<void> _update(AppSettings next) async {
+    AppHaptics.enabled = next.hapticsEnabled;
     state = AsyncData(next);
     await ref.read(settingsRepositoryProvider).save(next);
   }
@@ -71,6 +77,16 @@ class SettingsController extends AsyncNotifier<AppSettings> {
   Future<void> setFocusGoals(List<QuestCategory> goals) async {
     await _update(_current.copyWith(focusGoals: goals));
   }
+
+  /// Toggle haptic feedback on/off.
+  Future<void> toggleHaptics(bool enabled) async {
+    await _update(_current.copyWith(hapticsEnabled: enabled));
+  }
+
+  /// Toggle sound effects on/off.
+  Future<void> toggleSound(bool enabled) async {
+    await _update(_current.copyWith(soundEnabled: enabled));
+  }
 }
 
 final settingsProvider = AsyncNotifierProvider<SettingsController, AppSettings>(
@@ -103,4 +119,14 @@ final themeModeProvider = Provider<AppThemeMode>((ref) {
 /// The user's focus goals selected during onboarding.
 final focusGoalsProvider = Provider<List<QuestCategory>>((ref) {
   return ref.watch(settingsProvider).valueOrNull?.focusGoals ?? [];
+});
+
+/// Whether haptic feedback is enabled.
+final hapticsEnabledProvider = Provider<bool>((ref) {
+  return ref.watch(settingsProvider).valueOrNull?.hapticsEnabled ?? true;
+});
+
+/// Whether sound effects are enabled.
+final soundEnabledProvider = Provider<bool>((ref) {
+  return ref.watch(settingsProvider).valueOrNull?.soundEnabled ?? true;
 });

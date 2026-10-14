@@ -15,20 +15,41 @@ void main() {
       expect(loaded.displayName, 'Adventurer');
     });
 
-    test('round-trips onboarded, difficulty and name', () async {
-      SharedPreferences.setMockInitialValues({});
-      final repo = PrefsSettingsRepository();
-      await repo.save(
-        const AppSettings(
-          onboarded: true,
-          difficultyMode: DifficultyMode.hardcore,
-          displayName: 'Ada Lovelace',
-        ),
+    test(
+      'round-trips onboarded, difficulty, name, haptics, and sound',
+      () async {
+        SharedPreferences.setMockInitialValues({});
+        final repo = PrefsSettingsRepository();
+        await repo.save(
+          const AppSettings(
+            onboarded: true,
+            difficultyMode: DifficultyMode.hardcore,
+            displayName: 'Ada Lovelace',
+            hapticsEnabled: false,
+            soundEnabled: false,
+          ),
+        );
+        final again = await repo.load();
+        expect(again.onboarded, isTrue);
+        expect(again.difficultyMode, DifficultyMode.hardcore);
+        expect(again.displayName, 'Ada Lovelace');
+        expect(again.hapticsEnabled, isFalse);
+        expect(again.soundEnabled, isFalse);
+      },
+    );
+
+    test('toJson and fromJson preserves haptics and sound', () {
+      const original = AppSettings(
+        onboarded: true,
+        displayName: 'Hero',
+        hapticsEnabled: false,
+        soundEnabled: false,
       );
-      final again = await repo.load();
-      expect(again.onboarded, isTrue);
-      expect(again.difficultyMode, DifficultyMode.hardcore);
-      expect(again.displayName, 'Ada Lovelace');
+      final json = original.toJson();
+      final restored = AppSettings.fromJson(json);
+      expect(restored.displayName, 'Hero');
+      expect(restored.hapticsEnabled, isFalse);
+      expect(restored.soundEnabled, isFalse);
     });
   });
 

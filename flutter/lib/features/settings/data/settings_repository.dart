@@ -23,6 +23,8 @@ class PrefsSettingsRepository implements SettingsRepository {
   static const _kReminderMinute = 'reminderMinute';
   static const _kThemeMode = 'themeMode';
   static const _kFocusGoals = 'focusGoals';
+  static const _kHapticsEnabled = 'hapticsEnabled';
+  static const _kSoundEnabled = 'soundEnabled';
 
   @override
   Future<AppSettings> load() async {
@@ -66,6 +68,8 @@ class PrefsSettingsRepository implements SettingsRepository {
         orElse: () => AppThemeMode.dark,
       ),
       focusGoals: focusGoals,
+      hapticsEnabled: prefs.getBool(_kHapticsEnabled) ?? true,
+      soundEnabled: prefs.getBool(_kSoundEnabled) ?? true,
     );
   }
 
@@ -79,6 +83,8 @@ class PrefsSettingsRepository implements SettingsRepository {
     await prefs.setInt(_kReminderHour, settings.reminderHour);
     await prefs.setInt(_kReminderMinute, settings.reminderMinute);
     await prefs.setString(_kThemeMode, settings.themeMode.name);
+    await prefs.setBool(_kHapticsEnabled, settings.hapticsEnabled);
+    await prefs.setBool(_kSoundEnabled, settings.soundEnabled);
 
     // Save focus goals
     final goalsJson = jsonEncode(

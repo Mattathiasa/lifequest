@@ -56,8 +56,9 @@ void main() {
       // Should find settings items
       expect(find.text('Appearance'), findsOneWidget);
       expect(find.text('Notifications'), findsOneWidget);
+      expect(find.text('Sound & Haptics'), findsOneWidget);
       expect(find.text('Difficulty'), findsOneWidget);
-      expect(find.text('Privacy'), findsOneWidget);
+      expect(find.text('Data & Backup'), findsOneWidget);
       expect(find.text('Account'), findsOneWidget);
     });
 

@@ -7,6 +7,7 @@ import '../../../core/theme/app_typography.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../core/utils/haptics.dart';
 import '../../../core/widgets/glass_sheet.dart';
+import '../../backup/presentation/data_backup_sheet.dart';
 import '../../progression/application/progression_controller.dart';
 import '../../progression/domain/xp_rules.dart';
 import '../../settings/application/settings_controller.dart';
@@ -133,6 +134,14 @@ class ProfilePage extends ConsumerWidget {
                           onTap: () => _showNotificationSettings(context, ref),
                         ),
                         _SettingsRow(
+                          icon: Icons.vibration,
+                          name: 'Sound & Haptics',
+                          hint: ref.watch(hapticsEnabledProvider)
+                              ? 'Haptics on'
+                              : 'Haptics off',
+                          onTap: () => _showSoundHapticsSheet(context, ref),
+                        ),
+                        _SettingsRow(
                           icon: Icons.signal_cellular_alt,
                           name: 'Difficulty',
                           hint: mode.label,
@@ -140,9 +149,10 @@ class ProfilePage extends ConsumerWidget {
                               _showDifficultyPicker(context, ref, mode),
                         ),
                         _SettingsRow(
-                          icon: Icons.lock_outline,
-                          name: 'Privacy',
-                          hint: 'Data & security',
+                          icon: Icons.backup_outlined,
+                          name: 'Data & Backup',
+                          hint: 'Export & restore JSON',
+                          onTap: () => showDataBackupSheet(context),
                         ),
                         _SettingsRow(
                           icon: Icons.cloud_sync_outlined,
@@ -778,5 +788,124 @@ class _NotificationSettingsSheetState
     ref
         .read(settingsProvider.notifier)
         .setReminderTime(_reminderHour, _reminderMinute);
+  }
+}
+
+void _showSoundHapticsSheet(BuildContext context, WidgetRef ref) {
+  showGlassSheet(context, builder: (_) => const _SoundHapticsSheet());
+}
+
+class _SoundHapticsSheet extends ConsumerWidget {
+  const _SoundHapticsSheet();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final haptics = ref.watch(hapticsEnabledProvider);
+    final sound = ref.watch(soundEnabledProvider);
+
+    return GlassSheet(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('SOUND & HAPTICS', style: AppType.eyebrow),
+          const SizedBox(height: Gap.lg),
+
+          // Haptic Feedback Row
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Haptic Feedback', style: AppType.cardTitle),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Vibrations for quest complete, level-up & taps',
+                      style: AppType.bodySmall.copyWith(color: AppColors.slate),
+                    ),
+                  ],
+                ),
+              ),
+              Switch(
+                value: haptics,
+                onChanged: (val) {
+                  ref.read(settingsProvider.notifier).toggleHaptics(val);
+                },
+                activeThumbColor: AppColors.accent,
+                inactiveTrackColor: AppColors.trackInactive,
+              ),
+            ],
+          ),
+
+          const SizedBox(height: Gap.md),
+          Divider(color: AppColors.border),
+          const SizedBox(height: Gap.md),
+
+          // Sound Effects Row
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Sound Effects', style: AppType.cardTitle),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Audio cues for achievements and progression',
+                      style: AppType.bodySmall.copyWith(color: AppColors.slate),
+                    ),
+                  ],
+                ),
+              ),
+              Switch(
+                value: sound,
+                onChanged: (val) {
+                  ref.read(settingsProvider.notifier).toggleSound(val);
+                },
+                activeThumbColor: AppColors.accent,
+                inactiveTrackColor: AppColors.trackInactive,
+              ),
+            ],
+          ),
+
+          const SizedBox(height: Gap.xl),
+
+          // Test haptic pulse button
+          GestureDetector(
+            onTap: () {
+              AppHaptics.levelUp();
+            },
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(Radii.buttonLarge),
+                border: Border.all(color: AppColors.border),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.vibration,
+                    size: 18,
+                    color: AppColors.accent,
+                  ),
+                  const SizedBox(width: Gap.sm),
+                  Text(
+                    'Test Haptic Pulse',
+                    style: AppType.bodySmall.copyWith(color: AppColors.accent),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
+        ],
+      ),
+    );
   }
 }
