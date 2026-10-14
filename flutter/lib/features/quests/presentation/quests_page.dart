@@ -14,6 +14,7 @@ import '../../quests/application/quest_providers.dart';
 import '../../quests/domain/quest.dart';
 import '../../settings/application/settings_controller.dart';
 import 'create_quest_sheet.dart';
+import 'quest_templates_sheet.dart';
 
 /// Quest board page — full backlog, filterable, with new-quest creation.
 class QuestsPage extends ConsumerStatefulWidget {
@@ -105,6 +106,26 @@ class _QuestsPageState extends ConsumerState<QuestsPage> {
                           style: AppType.metaLabel,
                         ),
                         const SizedBox(width: Gap.md),
+                        GestureDetector(
+                          onTap: () => _openTemplatesSheet(context),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(
+                                Radii.iconTile,
+                              ),
+                              border: Border.all(color: AppColors.borderStrong),
+                            ),
+                            child: Text(
+                              'Templates',
+                              style: AppType.buttonSecondary,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: Gap.sm),
                         GestureDetector(
                           onTap: () => _openCreateSheet(context),
                           child: Container(
@@ -279,6 +300,10 @@ class _QuestsPageState extends ConsumerState<QuestsPage> {
 
   void _openCreateSheet(BuildContext context) {
     showCreateQuestSheet(context);
+  }
+
+  void _openTemplatesSheet(BuildContext context) {
+    showQuestTemplatesSheet(context);
   }
 
   void _openEditSheet(Quest quest) {
