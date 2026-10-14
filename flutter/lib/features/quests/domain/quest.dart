@@ -13,6 +13,7 @@ class Quest {
     required this.due,
     required this.schedule,
     this.done = false,
+    this.completedAt,
   });
 
   final int id;
@@ -25,6 +26,9 @@ class Quest {
   final String due;
   final QuestSchedule schedule;
   final bool done;
+
+  /// ISO-8601 UTC timestamp set when the quest is marked done.
+  final DateTime? completedAt;
 
   /// Computed XP reward for this quest (balanced mode).
   int get xp => XpRules.reward(difficulty, DifficultyMode.balanced);
@@ -39,6 +43,7 @@ class Quest {
     String? due,
     QuestSchedule? schedule,
     bool? done,
+    Object? completedAt = _sentinel,
   }) {
     return Quest(
       id: id,
@@ -51,8 +56,13 @@ class Quest {
       due: due ?? this.due,
       schedule: schedule ?? this.schedule,
       done: done ?? this.done,
+      completedAt: completedAt == _sentinel
+          ? this.completedAt
+          : completedAt as DateTime?,
     );
   }
+
+  static const _sentinel = Object();
 
   Map<String, dynamic> toJson() => {
     'id': id,
@@ -65,6 +75,7 @@ class Quest {
     'due': due,
     'schedule': schedule.name,
     'done': done,
+    if (completedAt != null) 'completedAt': completedAt!.toIso8601String(),
   };
 
   factory Quest.fromJson(Map<String, dynamic> json) => Quest(
@@ -87,6 +98,9 @@ class Quest {
       orElse: () => QuestSchedule.today,
     ),
     done: json['done'] as bool? ?? false,
+    completedAt: json['completedAt'] != null
+        ? DateTime.tryParse(json['completedAt'] as String)
+        : null,
   );
 }
 

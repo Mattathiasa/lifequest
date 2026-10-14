@@ -147,7 +147,12 @@ class InMemoryQuestRepository implements QuestRepository {
   @override
   Future<void> complete(int questId) async {
     final idx = _quests.indexWhere((q) => q.id == questId);
-    if (idx != -1) _quests[idx] = _quests[idx].copyWith(done: true);
+    if (idx != -1) {
+      _quests[idx] = _quests[idx].copyWith(
+        done: true,
+        completedAt: DateTime.now().toUtc(),
+      );
+    }
   }
 
   @override

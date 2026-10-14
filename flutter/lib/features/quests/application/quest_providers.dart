@@ -85,6 +85,22 @@ class QuestListNotifier extends Notifier<List<Quest>> {
         if (q.id == quest.id) quest else q,
     ];
   }
+
+  /// Restore a completed quest back to the active board.
+  ///
+  /// Clears [Quest.done] and [Quest.completedAt], resets schedule to
+  /// [QuestSchedule.today] so it appears in the Today tab immediately.
+  Future<void> restore(int questId) async {
+    final repo = ref.read(questRepositoryProvider);
+    final quest = state.firstWhere((q) => q.id == questId);
+    final restored = quest.copyWith(
+      done: false,
+      schedule: QuestSchedule.today,
+      completedAt: null,
+    );
+    await repo.update(restored);
+    state = [for (final q in state) q.id == questId ? restored : q];
+  }
 }
 
 final questListProvider = NotifierProvider<QuestListNotifier, List<Quest>>(

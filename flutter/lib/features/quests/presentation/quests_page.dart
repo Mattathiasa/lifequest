@@ -13,6 +13,7 @@ import '../../progression/domain/xp_rules.dart';
 import '../../quests/application/quest_providers.dart';
 import '../../quests/domain/quest.dart';
 import '../../settings/application/settings_controller.dart';
+import 'completed_quest_sheet.dart';
 import 'create_quest_sheet.dart';
 import 'quest_templates_sheet.dart';
 
@@ -266,18 +267,26 @@ class _QuestsPageState extends ConsumerState<QuestsPage> {
                           ],
                         ),
                       )
-                    // Quest list or empty state
-                    else if (filtered.isEmpty)
+                    else
+                      const SizedBox.shrink(),
+                    // Completed tab stats header
+                    if (tab == 'Completed' && filtered.isNotEmpty)
+                      ..._buildCompletedHeader(quests),
+
+                    // Loading/error handled above; show empty state or cards
+                    if (!isLoading && error == null && filtered.isEmpty)
                       EmptyState(
                         actionLabel: 'Create quest',
                         onAction: () => _openCreateSheet(context),
-                      )
-                    else
+                      ),
+
+                    if (!isLoading && error == null && filtered.isNotEmpty)
                       ...filtered.map(
                         (q) => _BoardQuestCard(
                           quest: q,
                           mode: mode,
-                          onTap: () => _openQuest(q),
+                          onTap: () =>
+                              q.done ? _openCompletedSheet(q) : _openQuest(q),
                           onEdit: () => _openEditSheet(q),
                           onDelete: () => _confirmDelete(q),
                         ),
@@ -296,6 +305,55 @@ class _QuestsPageState extends ConsumerState<QuestsPage> {
 
   void _openQuest(Quest quest) {
     showFocusSheet(context, quest: quest, autoStart: false);
+  }
+
+  void _openCompletedSheet(Quest quest) {
+    showCompletedQuestSheet(context, quest);
+  }
+
+  List<Widget> _buildCompletedHeader(List<Quest> allQuests) {
+    final completed = allQuests.where((q) => q.done).toList();
+    final totalXp = completed.fold<int>(0, (sum, q) => sum + q.xp);
+    return [
+      Container(
+        margin: const EdgeInsets.only(bottom: Gap.md),
+        padding: const EdgeInsets.all(Pad.card),
+        decoration: BoxDecoration(
+          gradient: AppColors.heroCard,
+          borderRadius: BorderRadius.circular(Radii.card),
+          border: Border.all(color: AppColors.accentBorder),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('TOTAL COMPLETED', style: AppType.eyebrow),
+                  const SizedBox(height: 4),
+                  Text('${completed.length}', style: AppType.statValue),
+                ],
+              ),
+            ),
+            Container(width: 1, height: 40, color: AppColors.borderStrong),
+            const SizedBox(width: Gap.lg),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('TOTAL XP EARNED', style: AppType.eyebrow),
+                  const SizedBox(height: 4),
+                  Text(
+                    '+$totalXp',
+                    style: AppType.statValue.copyWith(color: AppColors.accent),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    ];
   }
 
   void _openCreateSheet(BuildContext context) {

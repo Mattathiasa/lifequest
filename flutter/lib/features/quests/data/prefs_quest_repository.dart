@@ -56,7 +56,10 @@ class PrefsQuestRepository implements QuestRepository {
     final prefs = await SharedPreferences.getInstance();
     final quests = await _read(prefs);
     await _write(prefs, [
-      for (final q in quests) q.id == questId ? q.copyWith(done: true) : q,
+      for (final q in quests)
+        q.id == questId
+            ? q.copyWith(done: true, completedAt: DateTime.now().toUtc())
+            : q,
     ]);
   }
 
