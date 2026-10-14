@@ -7,6 +7,7 @@ import '../../../core/theme/app_typography.dart';
 import '../../../core/utils/formatters.dart';
 import '../../progression/application/progression_controller.dart';
 import '../../progression/domain/stats.dart';
+import '../application/coach_advice_provider.dart';
 
 class ProgressPage extends ConsumerWidget {
   const ProgressPage({super.key});
@@ -157,11 +158,7 @@ class ProgressPage extends ConsumerWidget {
                   const SizedBox(height: Gap.md),
 
                   // Coach card
-                  _CoachCard(
-                    xpByCategory: xpByCategory,
-                    totalXp: totalXp,
-                    streak: prog.streak,
-                  ),
+                  const _CoachCard(),
 
                   const SizedBox(height: 100), // bottom nav clearance
                 ],
@@ -418,51 +415,12 @@ class _XpBreakdown extends StatelessWidget {
   }
 }
 
-class _CoachCard extends StatelessWidget {
-  const _CoachCard({
-    required this.xpByCategory,
-    required this.totalXp,
-    required this.streak,
-  });
-
-  final Map<dynamic, int> xpByCategory;
-  final int totalXp;
-  final int streak;
+class _CoachCard extends ConsumerWidget {
+  const _CoachCard();
 
   @override
-  Widget build(BuildContext context) {
-    // Find the dominant category
-    String dominantCategory = 'Health';
-    int maxXP = 0;
-    for (final entry in xpByCategory.entries) {
-      if (entry.value > maxXP) {
-        maxXP = entry.value;
-        dominantCategory = entry.key.label;
-      }
-    }
-
-    // Find the weakest category
-    String weakestCategory = 'Social';
-    int minXP = totalXp;
-    for (final entry in xpByCategory.entries) {
-      if (entry.value < minXP) {
-        minXP = entry.value;
-        weakestCategory = entry.key.label;
-      }
-    }
-
-    // Generate coach message
-    String message;
-    if (totalXp == 0) {
-      message =
-          'Start completing quests to get personalized coaching recommendations.';
-    } else if (dominantCategory == weakestCategory) {
-      message =
-          'Great focus on $dominantCategory! Try diversifying your quests to build well-rounded skills.';
-    } else {
-      message =
-          'Your $dominantCategory quests are carrying the load. Try adding one $weakestCategory quest this week to round things out.';
-    }
+  Widget build(BuildContext context, WidgetRef ref) {
+    final advice = ref.watch(coachAdviceProvider);
 
     return Container(
       padding: const EdgeInsets.all(18),
@@ -474,12 +432,20 @@ class _CoachCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('COACH', style: AppType.eyebrow),
+          Row(
+            children: [
+              Text(advice.icon, style: const TextStyle(fontSize: 18)),
+              const SizedBox(width: Gap.sm),
+              Text(advice.tag, style: AppType.eyebrow),
+            ],
+          ),
           const SizedBox(height: Gap.sm),
           Text(
-            message,
-            style: AppType.body.copyWith(color: AppColors.textPrimary),
+            advice.headline,
+            style: AppType.cardTitle.copyWith(color: AppColors.textPrimary),
           ),
+          const SizedBox(height: Gap.xs),
+          Text(advice.body, style: AppType.body),
         ],
       ),
     );
